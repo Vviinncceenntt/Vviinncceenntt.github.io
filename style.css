@@ -3,6 +3,6 @@
     src: url('https://vviinncceenntt.github.io/fonts/noto-serif-hk/notoserifhk-regular.ttf') format('ttf');
     font-display: block;
 }
-p {
+body {
     font-family: 'notoserifhk-regular';
 }
