@@ -1,8 +1,0 @@
-@font-face {
-    font-family: 'Noto Serif HK', 'NotoSerifHK', 'noto-serif-hk', 'notoserifhk-regular';
-    src: url('notoserifhk-regular.ttf') format('ttf');
-    font-display: block;
-}
-body {
-    font-family: 'Noto Serif HK', 'NotoSerifHK', 'noto-serif-hk', 'notoserifhk-regular';
-}
