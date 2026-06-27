@@ -1,0 +1,7 @@
+The App Expo Go doesn't provide a means to scan QR code. It's an App with nothing.
+
+I did receive a Windows dialogue asking if I open Firewall to permit right before allowing the installation of expo@grok.
+
+The npm install took 32s rather than your estimated 16s to install 632 packages.
+
+Opening `http://192.168.1.42:8081/status on Chrome on computer, the browser says unable to connect, respond time takes too long. Opening on Safari on iPhone, it says server stops to respond.`

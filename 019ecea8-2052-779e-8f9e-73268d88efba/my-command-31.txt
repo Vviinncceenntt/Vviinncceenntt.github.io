@@ -1,0 +1,57 @@
+When running on expo, encountered:
+
+iOS Bundling failed 650ms node_modules\expo\AppEntry.js (1 module)
+
+ ERROR  Error: [BABEL]: Cannot find module 'react-native-worklets/plugin'
+
+Require stack:
+
+- C:\Users\vviiv\Desktop\Vincent\我的文件\workspace-019eef32-4588-74cd-914d-0a785df75efb\swiss-round-calculator\mobile\node_modules\react-native-reanimated\plugin\index.js
+
+- C:\Users\vviiv\Desktop\Vincent\我的文件\workspace-019eef32-4588-74cd-914d-0a785df75efb\swiss-round-calculator\mobile\node_modules\@babel\core\lib\config\files\module-types.js
+
+- C:\Users\vviiv\Desktop\Vincent\我的文件\workspace-019eef32-4588-74cd-914d-0a785df75efb\swiss-round-calculator\mobile\node_modules\@babel\core\lib\config\files\configuration.js
+
+- C:\Users\vviiv\Desktop\Vincent\我的文件\workspace-019eef32-4588-74cd-914d-0a785df75efb\swiss-round-calculator\mobile\node_modules\@babel\core\lib\config\files\index.js
+
+- C:\Users\vviiv\Desktop\Vincent\我的文件\workspace-019eef32-4588-74cd-914d-0a785df75efb\swiss-round-calculator\mobile\node_modules\@babel\core\lib\index.js
+
+- C:\Users\vviiv\Desktop\Vincent\我的文件\workspace-019eef32-4588-74cd-914d-0a785df75efb\swiss-round-calculator\mobile\node_modules\@expo\metro-config\build\transform-worker\metro-transform-worker.js
+
+- C:\Users\vviiv\Desktop\Vincent\我的文件\workspace-019eef32-4588-74cd-914d-0a785df75efb\swiss-round-calculator\mobile\node_modules\@expo\metro-config\build\transform-worker\transform-worker.js
+
+- C:\Users\vviiv\Desktop\Vincent\我的文件\workspace-019eef32-4588-74cd-914d-0a785df75efb\swiss-round-calculator\mobile\node_modules\metro\src\DeltaBundler\Worker.flow.js
+
+- C:\Users\vviiv\Desktop\Vincent\我的文件\workspace-019eef32-4588-74cd-914d-0a785df75efb\swiss-round-calculator\mobile\node_modules\metro\src\DeltaBundler\Worker.js
+
+- C:\Users\vviiv\Desktop\Vincent\我的文件\workspace-019eef32-4588-74cd-914d-0a785df75efb\swiss-round-calculator\mobile\node_modules\jest-worker\build\workers\processChild.js (While processing: C:\Users\vviiv\Desktop\Vincent\我的文件\workspace-019eef32-4588-74cd-914d-0a785df75efb\swiss-round-calculator\mobile\node_modules\react-native-reanimated\plugin\index.js)
+
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)
+
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1066:19)
+
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1071:22)
+
+    at Module._load (node:internal/modules/cjs/loader:1242:25)
+
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+
+    at Module.require (node:internal/modules/cjs/loader:1556:12)
+
+    at require (node:internal/modules/helpers:152:16)
+
+    at Object.&lt;anonymous&gt; (C:\Users\vviiv\Desktop\Vincent\我的文件\workspace-019eef32-4588-74cd-914d-0a785df75efb\swiss-round-calculator\mobile\node_modules\react-native-reanimated\plugin\index.js:2:16)
+
+    at Module._compile (node:internal/modules/cjs/loader:1812:14)
+
+    at Object..js (node:internal/modules/cjs/loader:1943:10)
+
+    at Module.load (node:internal/modules/cjs/loader:1533:32)
+
+    at Module._load (node:internal/modules/cjs/loader:1335:12)
+
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+
+    at Module.require (node:internal/modules/cjs/loader:1556:12)
+
+Also, documents are not updated except CHANGELOG.

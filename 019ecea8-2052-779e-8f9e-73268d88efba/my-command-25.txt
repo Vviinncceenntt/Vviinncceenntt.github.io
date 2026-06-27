@@ -1,0 +1,3 @@
+I haven't used your latest project file but tried what you said by opening a second tab and typed [http://192.168.0.127:8765/assets/fonts/ChironSungHK.ttf](http://192.168.0.127:8765/assets/fonts/ChironSungHK.ttf) and it started to download the font file of 24.5MB.
+
+Can you revoke the action of writing subsets of custom fonts for specific strings? I ask you to revoke because the Privacy Policy and other pages on Github may change any time in the future.

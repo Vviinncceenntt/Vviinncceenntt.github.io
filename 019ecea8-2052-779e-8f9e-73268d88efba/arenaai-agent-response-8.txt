@@ -1,0 +1,69 @@
+**Yes — Expo SDK 54 is exactly what you need.** Here's why:
+
+| Constraint | Your machine | SDK 54 requirement | Verdict |
+|---|---|---|---|
+| **Expo Go on iPhone 11 Pro** | 54.0.2 | Bundles SDK 54 runtime | ✅ **Must be SDK 54** |
+| Node.js | 24.14.1 | ≥ 20.19 | ✅ Far exceeds |
+| npm | 11.14.1 | ≥ 10 | ✅ |
+| Windows 11 | — | EAS Build runs iOS in the cloud | ✅ No Mac needed |
+
+### The Expo Go version dictates the SDK
+This is the binding constraint. Expo Go on the App Store is **pinned to one SDK at a time** — your "54.0.2" can only load JavaScript bundles built for **SDK 54**. If you bumped the project to SDK 55 or 56, `expo start` would refuse to connect to your phone (or Expo Go would show an "incompatible SDK" red-box error).
+
+- ❌ **SDK 51** (the original `package.json`) → Expo Go 54 cannot load it.
+- ✅ **SDK 54** (what I bumped to) → matches your Expo Go 54.0.2 perfectly.
+- ❌ **SDK 55 or 56** → would require upgrading Expo Go, but the App Store currently only ships SDK 54.
+
+### Workflow without a Mac (Windows + iPhone + EAS)
+
+1. **Develop & test on iPhone via Expo Go** (no Mac, no Xcode):
+   ```bash
+   cd mobile
+   rm -rf node_modules package-lock.json
+   npm install
+   npx expo start --tunnel        # --tunnel avoids needing same Wi-Fi
+   ```
+   Scan the QR code in Expo Go on your iPhone 11 Pro — the app boots over the air.
+
+2. **Build for the App Store from Windows** (EAS Build does the iOS compile on Apple's cloud machines):
+   ```bash
+   npm install -g eas-cli
+   eas login
+   eas build --platform ios --profile production
+   eas submit --platform ios
+   ```
+   You'll only need to provide:
+   - Apple Developer account credentials (free with iPhone; $99/yr for App Store publishing).
+   - App Store Connect API key (generated in the web dashboard).
+
+3. **Build for Google Play from Windows** (works natively, no cloud needed in theory, but EAS Build is still easiest):
+   ```bash
+   eas build --platform android --profile production
+   eas submit --platform android
+   ```
+
+### One small caveat about Expo Go
+
+Some native modules in your project **only work in EAS-built development builds**, not in plain Expo Go:
+
+| Module | Works in Expo Go? | Notes |
+|---|---|---|
+| `expo-screen-orientation` | ✅ | Bundled into Expo Go |
+| `expo-clipboard`, `expo-haptics`, `expo-font`, `expo-linear-gradient`, `expo-file-system`, `expo-constants`, `expo-splash-screen`, `expo-status-bar` | ✅ | All bundled |
+| `@react-native-async-storage/async-storage` | ✅ | Bundled |
+| `@react-native-community/netinfo` | ✅ | Bundled |
+| `react-native-svg`, `react-native-webview`, `react-native-safe-area-context` | ✅ | Bundled |
+| **`react-native-purchases`** | ❌ | **NOT in Expo Go.** Falls back gracefully thanks to my `try/require` guard in `src/utils/revenuecat.js`, but the Paywall purchase button will be inert. |
+
+This is by design — RevenueCat needs native StoreKit / Google Play Billing modules that Expo Go doesn't ship. The relevant flows still work in Expo Go:
+
+- ✅ Onboarding, dashboard, calculator, settings, all 4 menus, tooltips, swipe, theme/orientation toggles — fully testable.
+- ✅ When `revenuecat.js` can't load the native module, `getSubscriptionStatus()` returns `{ offline: true }` and the onboarding flow lets you straight into the app.
+- ⚠️ The actual purchase / restore flow can only be tested in an **EAS development build**:
+  ```bash
+  eas build --platform ios --profile development
+  ```
+  Install the resulting `.ipa` on your iPhone via TestFlight or direct install, and it will behave like Expo Go but with the RevenueCat native module bundled.
+
+### TL;DR
+Stay on **SDK 54**. Run `npm install` in `mobile/`, then `npx expo start --tunnel`, scan the QR code with Expo Go on your iPhone — everything in v1.0.6 should boot. When you're ready to test purchases or ship to the App Store, use EAS Build to do the iOS compile in the cloud (no Mac required).

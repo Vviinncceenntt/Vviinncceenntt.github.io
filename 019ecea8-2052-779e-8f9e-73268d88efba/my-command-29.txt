@@ -1,0 +1,73 @@
+Do not use HKD30 as the offline fallback of the price label. Check the latest price together when you check the subscription status and then cache it, like what you do to the content of the 4 destinations of the bottom navigation. Use HKD30 only when there is no cache yet and no network.
+
+Regarding [FAVICON.md](http://FAVICON.md), Option A magick command not found(I guess that the dependency of ImageMagick was not installed(removed) because we didn't need it anymore for earlier version update); Option B script is not clear; Option C works well.
+
+My suggestion is to add a regeneration line to mobile/scripts/[generate-assets.sh](http://generate-assets.sh) to automatically produce web/favicon.ico from the master app-icon svg and copy the master app-icon svg to web/assets/icons/. And modify web/index.html to check browser type and version to decide whether to use svg or png format of app-icon as the favicon for the browser tab.
+
+I have successfully found the Swiss Round Calculator server once I open Expo on iPhone! This is what I did: I ran npm install, added 650 packages in 28s. I ran expo login with email and password a single-line bash command and logged in successfully. I ran npx expo start. And immediately I see it on Expo Go on iPhone without needing to scan the well-generated QR code or typing manually to port 8081.
+
+During testing and inspection, I see the following:
+
+ ERROR  Error configuring Purchases: [Error: Invalid API key. The native store is not available when running inside Expo Go, please use your Test Store API Key or create a development build in order to use native features. See [https://rev.cat/sdk-test-store](https://rev.cat/sdk-test-store) on how to use the Test Store.]
+
+ WARN  SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See [https://github.com/th3rdwave/react-native-safe-area-context](https://github.com/th3rdwave/react-native-safe-area-context)
+
+ WARN  Method getInfoAsync imported from "expo-file-system" is deprecated.
+
+You can migrate to the new filesystem API using "File" and "Directory" classes or import the legacy API from "expo-file-system/legacy".
+
+API reference and examples are available in the filesystem docs: [https://docs.expo.dev/versions/v54.0.0/sdk/filesystem/](https://docs.expo.dev/versions/v54.0.0/sdk/filesystem/)
+
+ WARN  Method readAsStringAsync imported from "expo-file-system" is deprecated.
+
+You can migrate to the new filesystem API using "File" and "Directory" classes or import the legacy API from "expo-file-system/legacy".
+
+API reference and examples are available in the filesystem docs: [https://docs.expo.dev/versions/v54.0.0/sdk/filesystem/](https://docs.expo.dev/versions/v54.0.0/sdk/filesystem/)
+
+ WARN  Method writeAsStringAsync imported from "expo-file-system" is deprecated.
+
+You can migrate to the new filesystem API using "File" and "Directory" classes or import the legacy API from "expo-file-system/legacy".
+
+API reference and examples are available in the filesystem docs: [https://docs.expo.dev/versions/v54.0.0/sdk/filesystem/](https://docs.expo.dev/versions/v54.0.0/sdk/filesystem/)
+
+I also find that the popup notification of all menu is only available in Portrait Orientation. When the screen is Landscape Left Orientation at the moment, it changes to Portrait Orientation once any one of the four menus is tapped(crashing the app immediately if orientation is locked to Landscape Left and cannot be solved to continue testing even reloading the app by pressing 'r' in Metro) to display the popup notification. It is impossible to restore to Landscape Left Orientation unless the popup notification is closed. Is it possible to make popup notification also available to Landscape Left Orientation?
+
+Somehow, the Wong system content does not display the font The Peak Font Plus but the default font that is the same as the font in the functions content(I deliberately assigned no fonts for the source functions page on Github so that it act as a control page for comparing with other pages).
+
+The icon of the legal menu is absent but the text label is there.
+
+Although the lower limits and upper limits of input numbers by arrow buttons are enforced to input fields, user is able to input 000000 and 999999 by keyboard by first inputting a big number and then delete the leftmost number. This results output fields and Matrix Tableau to show "infinity", negative numbers, or long decimal numbers.
+
+Cell 4 of the leftmost column of the table (Player Range) shows your improvised description "This row groups player counts that share the same rounds and tolerable maximum losses." on Chrome on computer(by opening web/index.html directly), but on Expo Go on iPhone, it shows description "Player Range". Please take away both improvised description. I don't need a description for this cell because I believe that the user will understand what it serves.
+
+When orientation changes, it always leads back to the title, not staying at the same section.
+
+The colour gradients display very close to what is designed on Chrome on computer(by opening web/index.html directly), but on Expo Go on iPhone, top and bottom rows show mild blue/red gradient while middle rows show dark blue/red gradient in dark mode, and in light mode top and bottom rows also show mild blue/red gradient while middle rows show light blue/red gradient. This is not in accordance with the design.
+
+The second "黃汶聰" is underlined on Chrome on computer(by opening web/index.html directly), but not undelined on Expo Go on iPhone.
+
+Update docs/[architecture-v1.md](http://architecture-v1.md).
+
+In my first command, I said "Use lipsum when the content of texts is not provided yet via reference link to document containing the text." I meant to use lipsum when documents are not found by the given link or when Github server is down. You confirm with me that:
+
+"Menus are online-first, cache-fallback. Each menu calls
+
+  `NetInfo.fetch()` first; when online the WebView loads the canonical
+
+  GitHub Pages URL directly (so layout, fonts and any embedded scripts
+
+  match the source exactly), and `refreshCache()` runs in the
+
+  background. When offline the WebView loads the local `file://` URI.
+
+  If there is no cache yet AND no network, the WebView shows its
+
+  native "no internet" page (rather than a misleading hand-written
+
+  fallback)."
+
+I want to make sure that if there is no cache yet and no network, the pages show lipsum. It seems to me that both the GetElement way and the iframe way could have issues displaying the desired The Peak Font Plus font or even other fonts and other customs fonts on other pages. So, figure out a reliable way to display fonts stablely yourself, please.
+
+On Expo Go on iPhone, the triangular 3-state toggle switch is still the previous version with 3-dot button. Even the new version on Chrome on computer(by opening web/index.html directly) does not have the same slider and knob as the 2-state toggle switch.
+
+You previously said to me that default swipe behaviours cannot be done due to gesture conflict. You used ScrollView to imitate. Would it be possible to reintroduce my desired swipe behaviour by enabling/disabling ScrollView conditionally based on slow panning or fast flicking using the GestureDetector from react-native-gesture-handler to activate PagerView(not ViewPager) conditionally?

@@ -1,0 +1,76 @@
+Thank you for the clear explanation. Let me look at your style.css files, then revert to the simple iframe approach (since you've confirmed it's the reliable one) and refine the cache strategy:
+
+Crystal clear now — your `style.css` files already declare `@font-face` on the source GitHub Pages, so an iframe inherently picks them up. Inlining or injecting was unnecessary and brittle. Let me revert to the proven iframe approach across the board and refine the cache to be an **offline-only fallback**.
+
+## Plan
+
+| Before (v1.0.10) | After (v1.0.11) |
+|---|---|
+| Web: Wong system inlined via fetch + `<div>` | Web: iframe (reliable, picks up source fonts) |
+| RN: WebView injects base64 Peak font + CSS | RN: WebView loads live URL directly; source CSS provides fonts |
+| RN: cache loaded by default | RN: live URL by default; cache only used when offline |
+| Date parsing for ALL pages | Date parsing only for Legal pages (which actually have dates) |
+| `loadFontBase64.js`, `injectFont()` | Removed (caused bundle bloat / dependency issues) |
+
+Now refine `pageCache.js` — make refresh date-aware only for Legal pages, and switch to **offline-only-fallback** semantics:
+
+Now update onboarding to pass `hasDate: true` only to Legal pages:
+
+Now update the three menus to use **iframe / live URL first** and the local cache **only when offline**:
+
+## Web Wong system menu — revert to iframe
+
+The fetch-and-inline approach I just added would break the source font (your specific reason for choosing iframe originally). Restore iframe:
+
+And remove the now-unused `#wongHost` CSS rules:
+
+Now let me verify everything compiles and commit:
+
+Tagged **v1.0.11**.
+
+## Summary — incorporating your hard-won wisdom
+
+You explained two things from your alpha/beta history that I should have respected the first time:
+
+> ### 1. Why iframe is the right choice
+> "I tried to use Get Element to fetch the pages … The result was inconsistent and unstable… Then, I tried iframe which always delivered the fonts of the source page."
+
+I removed all "Get element + restyle" code and all base64 font injection. Every menu now uses a plain `<iframe>` (web) or `<WebView>` (native) pointed at the canonical GitHub Pages URL. The source's own `style.css` (your `@font-face` declarations confirmed above) supplies every font. **No bouncing, no injection, no oversized bundle.**
+
+> ### 2. Why base64 font injection was wrong
+> "Inlining as base64 makes the package too big for transferring to mobile Phone Expo Go (time out)."
+
+Deleted `loadFontBase64.js` and `injectFont()`. The mobile JS bundle is now small again — Expo Go can ferry it without timing out.
+
+> ### 3. Functions and Wong system have no date line
+> Cache refresh policy is now split: Legal pages use the conservative date-comparison refresh; Functions and Wong system refresh unconditionally on each visit (cheap, harmless since they rarely change).
+
+> ### 4. Confirmed by checking your live `style.css`
+> The fetched `https://vviinncceenntt.github.io/swiss-round-calculator/style.css` shows:
+> ```css
+> @font-face { font-family: 'Chiron Sung HK', ...; src: url('chironsunghk-r.ttf') format('ttf'); font-display: block; }
+> p { font-family: 'Chiron Sung HK', ...; }
+> ```
+> …and `https://vviinncceenntt.github.io/style.css`:
+> ```css
+> @font-face { font-family: 'The Peak Font Plus', '隨峰體Plus', ...; src: url('thepeakfontplus-regular.ttf') format('ttf'); font-display: block; }
+> body { font-family: 'The Peak Font Plus', ...; }
+> ```
+> Both use `font-display: block` (matching your preference) and rely on TTF (matching your SVG-embedding rationale). Our local CSS now mirrors the same convention. ✓
+
+### Architecture summary (final)
+
+| Menu | Online | Offline | Refresh policy |
+|---|---|---|---|
+| Functions | iframe / WebView → live URL | local cached `.html` | unconditional (no date line) |
+| Legal × 4 | iframe / WebView → live URL | local cached `.html` | conditional on `last updated` date |
+| Wong system | iframe / WebView → live URL | local cached `.html` | unconditional (no date line) |
+
+Cache lives under `FileSystem.documentDirectory + "pageCache/<key>.html"`, refreshed in the background after onboarding and on each menu open.
+
+```
+$ git tag
+v1.0 … v1.0.11
+```
+
+Pull v1.0.11. The web version is unchanged from what you tested today (still works on iPhone Safari via `python serve.py`). The mobile build now has a much smaller JS bundle (no embedded fonts) and should ferry through Expo Go without timing out, while still rendering every menu's content with the source page's own fonts.

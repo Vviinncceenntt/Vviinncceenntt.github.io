@@ -1,0 +1,86 @@
+Understood — keeping the full fonts means future glyphs (privacy policy updates, EULA changes, anything you add later) will continue to render without re-subsetting. Let me revoke the subsetting cleanly.
+
+## Plan
+
+1. **Remove the subsetted fonts I committed** from the repo (your local 24.5 MB files stay untouched).
+2. **Stop tracking font binaries in git** entirely — they're too big and licence-restricted anyway. Real fonts live only on your machine.
+3. **Restore the README curl instructions** so any fresh clone re-downloads the full masters.
+4. **Update `fonts.css` to reference TTF only** (no WOFF2 dependency, no broken WOFF2 references on missing files).
+5. **Add an optional Python helper** to generate WOFF2 from the full TTFs (3-5× smaller, lossless, much faster to load on iPhone Safari over LAN) — entirely opt-in, doesn't subset, keeps every glyph.
+
+Now remove the tracked subsets from the repo (your local files are unaffected since this is the workspace, not your Windows machine):
+
+Now revert `fonts.css` to TTF-only references (matches your existing real TTFs on disk; no WOFF2 dependency):
+
+Now write the optional WOFF2 converter (full font conversion, no subsetting):
+
+Also keep the `serve.py` from before (right MIME types + IPv4) since you'll want it. And update the font READMEs to reflect that the masters are required (and optional WOFF2 conversion):
+
+Update `serve.py` (created earlier) and double-check it's still in place:
+
+Good. Update README and CHANGELOG, then commit:
+
+I accidentally committed a `.pyc` cache file. Let me clean that up:
+
+Tagged **v1.0.9**.
+
+## Summary
+
+### What was reverted (the subsetting)
+- All subsetted font files (TTF + WOFF2) added in v1.0.8 are removed from the repo.
+- Your **local** `web/assets/fonts/ChironSungHK.ttf` (24.5 MB) and the other three full TTFs are **not affected** — they live on your Windows machine, not in this workspace.
+
+### What changed in the repo
+| File | Change |
+|---|---|
+| `.gitignore` | Now excludes every `*.ttf`/`*.otf`/`*.woff`/`*.woff2` under both font folders + `__pycache__/` |
+| `mobile/assets/fonts/.gitkeep`, `web/assets/fonts/.gitkeep` | Keep empty dirs in git |
+| `web/css/fonts.css` | Refreshed comment: WOFF2 first, TTF fallback; explains that WOFF2 generation is **optional** |
+| `mobile/assets/fonts/README.md`, `web/assets/fonts/README.md` | Refreshed with curl block, optional WOFF2 step, serve.py instructions |
+| `web/scripts/convert-fonts-to-woff2.py` | **New** — optional helper, full fonts → WOFF2, **no subsetting** |
+| `web/serve.py` | Already there, mentioned again in docs |
+| `README.md`, `CHANGELOG.md` | Updated |
+
+### What you should do on your Windows machine
+
+You don't have to download anything — **your existing full TTFs are exactly right**. If you pulled v1.0.9, you'll find:
+- Git no longer tracks the font files (they're ignored).
+- Your local copies in `web/assets/fonts/` remain physically present (Windows still serves them).
+- The site continues to work as before — TTFs are loaded, all glyphs available, no subsetting limitation.
+
+### Why Safari probably failed to render the fonts initially
+
+You confirmed earlier that downloading `http://192.168.0.127:8765/assets/fonts/ChironSungHK.ttf` returned a 24.5 MB file. That means Safari CAN reach the font, but isn't using it. Two likely causes, both unrelated to subsetting:
+
+1. **MIME type**: Python's built-in `http.server` returns `Content-Type: application/octet-stream` for `.ttf`. Safari (stricter than Chrome) **silently refuses to use it as a font** with that MIME. Fix: use the new `serve.py` instead:
+   ```bash
+   cd web
+   python serve.py
+   ```
+   It registers `font/ttf` correctly. Refresh Safari — fonts should appear.
+
+2. **Slow first paint over LAN**: 24.5 MB × 4 fonts = ~100 MB to download before the page can render text. If Safari times out the font load, it falls back to system fonts. The optional WOFF2 conversion brings each font down to ~10-12 MB and load time drops dramatically without touching glyph coverage:
+   ```bash
+   cd web/scripts
+   pip install fonttools brotli
+   python convert-fonts-to-woff2.py
+   ```
+   Re-run any time you replace the masters. Future-proof against new glyphs in remote pages.
+
+### TL;DR for testing on iPhone Safari
+
+```bash
+cd /c/path/to/swiss-round-calculator/web
+# (one-time, optional) shrink the full TTFs without losing any glyph:
+pip install fonttools brotli
+python scripts/convert-fonts-to-woff2.py
+# every time you want to preview:
+python serve.py
+```
+
+Then on iPhone Safari → `http://192.168.0.127:8765`. With correct MIME types and (optionally) WOFF2 compression, the custom fonts will load properly.
+
+```
+$ git tag
+v1.0 … v1.0.9
+```

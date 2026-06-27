@@ -1,0 +1,23 @@
+On running the script "[generate-assets.sh](http://generate-assets.sh)" again on Git Bash, I see the following:
+
+Tool detection:
+
+  inkscape    : NOT FOUND
+
+  rsvg-convert: NOT FOUND
+
+  magick      : convert
+
+  ghostscript : NOT FOUND
+
+==&gt; app-icon (1024 px)
+
+   PDF route unavailable -&gt; direct SVG -&gt; PNG
+
+參數無效 - none
+
+Then, I check all folders to find no such files as "app.json._masterAssets" and no such file as "app.json.extra".
+
+In the Settings, the Theme has become real toggle switch, but the Orientation Lock has not. They are 3 adjacent sections of a rounded rectangle acting as buttons for selection, though they are really grayed out because it is not available on web, only for mobile use. I have really seen a triangular toggle switch on some website which demonstrate toggle switches as UI.
+
+The contents of the Functions, Legal, Wong system menus are hard to read in dark mode. Take off the overlaying mask if you are fetching the sources directly by iframe, or, consider turning white background to black and black text to white because the sources just contain plain text with custom fonts and simple styles, no colours applied.

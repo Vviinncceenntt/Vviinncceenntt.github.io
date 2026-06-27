@@ -1,0 +1,92 @@
+The `exp.direct` tunnel service is frequently slow or down — it routes your bundle through a relay server in the US, which often times out. Since you're on the **same Wi-Fi as your iPhone**, you don't need `--tunnel` at all. Use **LAN mode** instead, which connects your phone directly to the dev server on your PC. Much faster, more reliable.
+
+## Try these in order
+
+### 1️⃣ LAN mode (recommended — should "just work")
+
+```bash
+cd mobile
+npx expo start --lan --clear
+```
+
+Open the QR code in Expo Go (not the iPhone camera — see step 4). Bundle download takes ~10-30 s the first time.
+
+### 2️⃣ If LAN times out, the Windows Firewall is blocking Metro
+
+Windows 11 blocks inbound connections to Node.js by default. Allow it once:
+
+**Option A — GUI:**
+1. Windows key → search "Allow an app through Windows Firewall"
+2. Click "Change settings" → "Allow another app…"
+3. Browse to `C:\Program Files\nodejs\node.exe` → add it
+4. Tick both **Private** AND **Public** check-boxes
+5. Click OK, then restart `npx expo start --lan`
+
+**Option B — one-liner in PowerShell (Run as Administrator):**
+
+```powershell
+New-NetFirewallRule -DisplayName "Expo Metro 8081" -Direction Inbound -Protocol TCP -LocalPort 8081 -Action Allow
+New-NetFirewallRule -DisplayName "Expo Metro 19000-19002" -Direction Inbound -Protocol TCP -LocalPort 19000-19002 -Action Allow
+```
+
+### 3️⃣ Force the dev server to bind to your LAN IP
+
+Sometimes Expo binds to a "wrong" interface (VPN, virtual adapter, etc.). Find your real Wi-Fi IP first:
+
+```bash
+ipconfig
+```
+
+Look for **"Wireless LAN adapter Wi-Fi"** → the IPv4 line, e.g. `192.168.1.42`. Then:
+
+```bash
+set REACT_NATIVE_PACKAGER_HOSTNAME=192.168.1.42
+npx expo start --lan --clear
+```
+
+Make sure your iPhone is on the **same SSID** as that adapter (not on cellular, not on a guest network — guest networks isolate clients).
+
+### 4️⃣ Use the QR code **inside Expo Go**, not the iPhone Camera app
+
+On iOS, the Camera app opens `exp://…` URLs in a special handler that can be slower. Open **Expo Go itself**, tap "Scan QR Code" on its home screen, then scan. That uses Expo Go's native loader which is faster and gives clearer errors.
+
+### 5️⃣ If you're stuck on a network where LAN is impossible (e.g. corporate / hotel Wi-Fi)
+
+Fall back to `--tunnel` but switch the underlying provider — Expo now lets you pick between `ngrok` and the default `exp.direct`. `ngrok` is usually much faster:
+
+```bash
+npm install -g @expo/ngrok
+npx expo start --tunnel --clear
+```
+
+(You may be prompted to install `@expo/ngrok` automatically — say yes.)
+
+---
+
+## What was wrong with what you tried
+
+| Symptom | Cause |
+|---|---|
+| "The request timed out" via `exp.direct` | The tunnel relay was slow or your bundle was too large to ship in 30s through it. Not a code problem. |
+| "expo@grok" global install prompt | That was actually `@expo/ngrok` (your terminal rendered the `@` and `/` oddly). It's harmless — needed only for tunnel mode. |
+| Switching to port 8082 didn't help | Port number doesn't matter; the failure was in the tunnel, not the local server. |
+
+---
+
+## Quick smoke test that the network works
+
+Before scanning, open Safari on your iPhone and visit:
+
+```
+http://192.168.1.42:8081/status      ← use YOUR PC's Wi-Fi IP
+```
+
+You should see `packager-status:running`. If you don't, the firewall is still blocking (return to step 2). If you do, scan the QR and the app will load almost instantly.
+
+---
+
+## Reasonable expectation on first launch
+
+Even after the network is unblocked, the very first bundle load takes **15–30 seconds** because Metro is transforming ~600 files + your `p-writing.svg` (~89 KB of inlined SVG). Subsequent reloads (after editing code) are much faster thanks to Metro's cache.
+
+If the bundle hangs at "0%" for more than a minute after a successful network handshake, that's a different problem and I'll diagnose it from the Metro logs — paste whatever appears in your `cmd` window when the iPhone tries to connect.

@@ -1,0 +1,86 @@
+The bug is on line 37 of `App.js` — my comment closer got mangled: `*the nav itself is treated as the bottom safe-area consumer.* /}` should be `* the nav itself is treated as the bottom safe-area consumer. */}`. The `*/` got merged into `.*/`. Let me check and fix:
+
+Found the actual bug: I put a JSX comment `{/* ... */}` **directly inside `return (...)`** but BEFORE the single JSX root element. JSX requires the root expression to start with `<` immediately — a JSX comment placed there is invalid syntax. The comment must be **inside** the root element. Let me fix:
+
+Now do a thorough review of every JS/JSX file for similar bugs. Install babel locally and parse each file as JSX to catch any other issues:
+
+All 27 mobile files + App.js + 3 web files parse cleanly. Let me also do a "git grep" for any other suspicious patterns I might have missed (improperly placed JSX comments, broken require, undefined imports):
+
+Clean — those `return (` lines are followed by valid JSX. `Svg` is correctly used in `OrientTriangle.js`. `p-writing` only appears in a comment.
+
+Let me also verify the App.js change works at runtime by re-parsing:
+
+Fixed. Now also let me audit the **whole codebase** more carefully for subtle problems I might have introduced — particularly around runtime errors that won't show as syntax errors:
+
+I see another **lipsum** import issue — FunctionsMenu, LegalMenu, WongMenu lost the `LIPSUM` import after the rewrite. Let me check:
+
+Wait — my search above missed `^import { LIPSUM }` because the import list got truncated. Let me check the actual import lines:
+
+All imports present and correct. Now let me also check `SettingsMenu.js` for any leftover stale code referring to the removed `OrientToggle`:
+
+Clean. Note the JSX comments here — `{/* Theme */}`, `{/* Orientation */}` etc. — are correctly placed as children of `<Modal>`, not as siblings of the root. These work fine.
+
+Now check OnboardingScreen for the `_osIsIOS` variable that's defined but I don't think used — and check for any other issues:
+
+`_osIsIOS` is unused — harmless, the underscore prefix signals intent. `config` is imported but I notice it's not used; not harmful but let me clean up:
+
+Run the parser sweep one more time to be sure nothing broke:
+
+All 28 files parse cleanly. Let me also verify the web build still works:
+
+Commit and tag v1.0.15:
+
+Tagged **v1.0.15**.
+
+## Summary
+
+### The actual bug
+
+JSX has one strict rule about `return ( … )`: **the first thing inside the parentheses must be a JSX element (`<…>`)**, not a `{…}` expression. My v1.0.13 safe-area block did this:
+
+```js
+return (
+  {/* Apply safe-area to ALL edges so neither … */}   ← JSX comment as sibling
+  <SafeAreaView …>                                    ← + JSX element
+    …
+  </SafeAreaView>
+);
+```
+
+The Babel parser sees `{` after `return (` and tries to interpret it as the start of an object expression, then chokes on the `<` that follows. JSX comments are perfectly valid INSIDE a JSX element (like `<Modal>{/* Theme */}</Modal>`) but NOT as a sibling of the root in a return.
+
+### Fix
+
+Moved the explanation to plain `//` comments **above** the `return`, leaving only the SafeAreaView root inside the parentheses:
+
+```js
+// Apply safe-area to ALL edges so neither the iPhone notch (top +
+// sides in landscape) nor the home indicator (bottom) clips
+// dashboard content, input steppers, table edges, or note paragraphs.
+// The bottom edge sits underneath the BottomNav so the nav itself is
+// treated as the bottom safe-area consumer.
+return (
+  <SafeAreaView style={{ flex: 1, backgroundColor: theme.bg }} edges={['top', 'left', 'right']}>
+    …
+  </SafeAreaView>
+);
+```
+
+### Full codebase audit
+
+To make sure no similar issue is hiding elsewhere, I ran **`@babel/parser`** (with the full JSX, class-properties, optional-chaining, nullish-coalescing, object-rest-spread plugins) over **all 28 mobile JSX files**, and **`node --check`** over all 3 web JS files plus the bash scripts.
+
+Result: **All 28 mobile files + 3 web files + 2 shell scripts parse cleanly.** No more lurking syntax issues.
+
+I also did a targeted search for:
+- Other "return ( {" patterns → none found
+- Stray references to removed symbols (`p-writing`, `pWriting`, `loadFontBase64`, `injectFont`, `LEGAL_FALLBACK`) → only inside doc comments
+- Wrong `expo-file-system` imports → none, all use `'expo-file-system/legacy'`
+- Missing `LIPSUM` imports → all three menus import it correctly
+
+Pull v1.0.15, restart Expo (`npm run start`), bundling should now succeed.
+
+```
+$ git tag
+v1.0  v1.0.1 ... v1.0.14  v1.0.15
+```

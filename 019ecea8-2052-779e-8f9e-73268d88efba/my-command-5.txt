@@ -1,0 +1,239 @@
+I see something else on Git Bash as I run the script:
+
+Tool detection:
+
+  inkscape    : NOT FOUND
+
+  rsvg-convert: NOT FOUND
+
+  magick      : convert
+
+  ghostscript : NOT FOUND
+
+  node / npm  : node / npm
+
+==&gt; app-icon (1024 px)
+
+   downloaded SVG (27699 bytes) -&gt; assets/images/svg/app-icon.svg
+
+      [ImageMagick A: flags-before-input]
+
+awk: cmd. line:1: (FILENAME=- FNR=1) warning: Invalid multibyte data detected. There may be a mismatch between your data and your locale
+
+        &gt; ▒ѼƵL▒ - 384
+
+      [ImageMagick B: no transparency]
+
+awk: cmd. line:1: (FILENAME=- FNR=1) warning: Invalid multibyte data detected. There may be a mismatch between your data and your locale
+
+        &gt; ѼƵL▒ - 384
+
+      [ImageMagick C: explicit svg:/png:]
+
+awk: cmd. line:1: (FILENAME=- FNR=1) warning: Invalid multibyte data detected. There may be a mismatch between your data and your locale
+
+        &gt; ѼƵL▒ - 384
+
+      [ImageMagick D: simplest]
+
+awk: cmd. line:1: (FILENAME=- FNR=1) warning: Invalid multibyte data detected. There may be a mismatch between your data and your locale
+
+        &gt; ѼƵL▒ - /images
+
+      [Node fallback] bootstrapping @resvg/resvg-js (one-time, ~5 MB)...
+
+        &gt;
+
+        &gt; added 2 packages in 2s
+
+        &gt; npm notice
+
+        &gt; npm notice New minor version of npm available! 11.14.1 -&gt; 11.17.0
+
+        &gt; npm notice Changelog: [https://github.com/npm/cli/releases/tag/v11.17.0](https://github.com/npm/cli/releases/tag/v11.17.0)
+
+        &gt; npm notice To update run: npm install -g npm@11.17.0
+
+        &gt; npm notice
+
+      [Node (@resvg/resvg-js) SVG-&gt;PNG]
+
+        &gt; wrote assets/images/app-icon-1024.png 125754 bytes
+
+   OK via Node WASM fallback -&gt; assets/images/app-icon-1024.png
+
+==&gt; splash-landscape-light (2732 px)
+
+   downloaded SVG (726 bytes) -&gt; assets/images/svg/splash-landscape-light.svg
+
+      [ImageMagick A: flags-before-input]
+
+awk: cmd. line:1: (FILENAME=- FNR=1) warning: Invalid multibyte data detected. There may be a mismatch between your data and your locale
+
+        &gt; ѼƵL▒ - 384
+
+      [ImageMagick B: no transparency]
+
+awk: cmd. line:1: (FILENAME=- FNR=1) warning: Invalid multibyte data detected. There may be a mismatch between your data and your locale
+
+        &gt; ѼƵL▒ - 384
+
+      [ImageMagick C: explicit svg:/png:]
+
+awk: cmd. line:1: (FILENAME=- FNR=1) warning: Invalid multibyte data detected. There may be a mismatch between your data and your locale
+
+        &gt; ѼƵL▒ - 384
+
+      [ImageMagick D: simplest]
+
+awk: cmd. line:1: (FILENAME=- FNR=1) warning: Invalid multibyte data detected. There may be a mismatch between your data and your locale
+
+        &gt; ѼƵL▒ - /images
+
+      [Node (@resvg/resvg-js) SVG-&gt;PNG]
+
+        &gt; wrote assets/images/splash-landscape-light-2732.png 59025 bytes
+
+   OK via Node WASM fallback -&gt; assets/images/splash-landscape-light-2732.png
+
+==&gt; splash-landscape-dark (2732 px)
+
+   downloaded SVG (726 bytes) -&gt; assets/images/svg/splash-landscape-dark.svg
+
+      [ImageMagick A: flags-before-input]
+
+awk: cmd. line:1: (FILENAME=- FNR=1) warning: Invalid multibyte data detected. There may be a mismatch between your data and your locale
+
+        &gt; ѼƵL▒ - 384
+
+      [ImageMagick B: no transparency]
+
+awk: cmd. line:1: (FILENAME=- FNR=1) warning: Invalid multibyte data detected. There may be a mismatch between your data and your locale
+
+        &gt; ѼƵL▒ - 384
+
+      [ImageMagick C: explicit svg:/png:]
+
+awk: cmd. line:1: (FILENAME=- FNR=1) warning: Invalid multibyte data detected. There may be a mismatch between your data and your locale
+
+        &gt; ѼƵL▒ - 384
+
+      [ImageMagick D: simplest]
+
+awk: cmd. line:1: (FILENAME=- FNR=1) warning: Invalid multibyte data detected. There may be a mismatch between your data and your locale
+
+        &gt; ѼƵL▒ - /images
+
+      [Node (@resvg/resvg-js) SVG-&gt;PNG]
+
+        &gt; wrote assets/images/splash-landscape-dark-2732.png 60170 bytes
+
+   OK via Node WASM fallback -&gt; assets/images/splash-landscape-dark-2732.png
+
+==&gt; splash-portrait-light (2732 px)
+
+   downloaded SVG (1011 bytes) -&gt; assets/images/svg/splash-portrait-light.svg
+
+      [ImageMagick A: flags-before-input]
+
+awk: cmd. line:1: (FILENAME=- FNR=1) warning: Invalid multibyte data detected. There may be a mismatch between your data and your locale
+
+        &gt; ѼƵL▒ - 384
+
+      [ImageMagick B: no transparency]
+
+awk: cmd. line:1: (FILENAME=- FNR=1) warning: Invalid multibyte data detected. There may be a mismatch between your data and your locale
+
+        &gt; ѼƵL▒ - 384
+
+      [ImageMagick C: explicit svg:/png:]
+
+awk: cmd. line:1: (FILENAME=- FNR=1) warning: Invalid multibyte data detected. There may be a mismatch between your data and your locale
+
+        &gt; ѼƵL▒ - 384
+
+      [ImageMagick D: simplest]
+
+awk: cmd. line:1: (FILENAME=- FNR=1) warning: Invalid multibyte data detected. There may be a mismatch between your data and your locale
+
+        &gt; ѼƵL▒ - /images
+
+      [Node (@resvg/resvg-js) SVG-&gt;PNG]
+
+        &gt; wrote assets/images/splash-portrait-light-2732.png 52255 bytes
+
+   OK via Node WASM fallback -&gt; assets/images/splash-portrait-light-2732.png
+
+==&gt; splash-portrait-dark (2732 px)
+
+   downloaded SVG (1011 bytes) -&gt; assets/images/svg/splash-portrait-dark.svg
+
+      [ImageMagick A: flags-before-input]
+
+awk: cmd. line:1: (FILENAME=- FNR=1) warning: Invalid multibyte data detected. There may be a mismatch between your data and your locale
+
+        &gt; ѼƵL▒ - 384
+
+      [ImageMagick B: no transparency]
+
+awk: cmd. line:1: (FILENAME=- FNR=1) warning: Invalid multibyte data detected. There may be a mismatch between your data and your locale
+
+        &gt; ѼƵL▒ - 384
+
+      [ImageMagick C: explicit svg:/png:]
+
+awk: cmd. line:1: (FILENAME=- FNR=1) warning: Invalid multibyte data detected. There may be a mismatch between your data and your locale
+
+        &gt; ѼƵL▒ - 384
+
+      [ImageMagick D: simplest]
+
+awk: cmd. line:1: (FILENAME=- FNR=1) warning: Invalid multibyte data detected. There may be a mismatch between your data and your locale
+
+        &gt; ѼƵL▒ - /images
+
+      [Node (@resvg/resvg-js) SVG-&gt;PNG]
+
+        &gt; wrote assets/images/splash-portrait-dark-2732.png 55988 bytes
+
+   OK via Node WASM fallback -&gt; assets/images/splash-portrait-dark-2732.png
+
+==&gt; splash-android12-light (2732 px)
+
+   downloaded SVG (742 bytes) -&gt; assets/images/svg/splash-android12-light.svg
+
+      [inlining remote &lt;image href&gt; references]
+
+        &gt; inlined [https://raw.githubusercontent.com/Vviinncceenntt/swiss-round-calculator/main/appiconmastersvg.svg](https://raw.githubusercontent.com/Vviinncceenntt/swiss-round-calculator/main/appiconmastersvg.svg) -&gt; 27699 bytes
+
+      [Node (@resvg/resvg-js) SVG-&gt;PNG]
+
+        &gt; wrote assets/images/splash-android12-light-2732.png 157813 bytes
+
+   OK via Node WASM fallback (skipped ImageMagick: inlined data URIs) -&gt; assets/images/splash-android12-light-2732.png
+
+==&gt; splash-android12-dark (2732 px)
+
+   downloaded SVG (742 bytes) -&gt; assets/images/svg/splash-android12-dark.svg
+
+      [inlining remote &lt;image href&gt; references]
+
+        &gt; inlined [https://raw.githubusercontent.com/Vviinncceenntt/swiss-round-calculator/main/appiconmastersvg.svg](https://raw.githubusercontent.com/Vviinncceenntt/swiss-round-calculator/main/appiconmastersvg.svg) -&gt; 27699 bytes
+
+      [Node (@resvg/resvg-js) SVG-&gt;PNG]
+
+        &gt; wrote assets/images/splash-android12-dark-2732.png 156640 bytes
+
+   OK via Node WASM fallback (skipped ImageMagick: inlined data URIs) -&gt; assets/images/splash-android12-dark-2732.png
+
+================================================================
+
+  Generated : 7 / 7
+
+  SVG masters kept in: assets/images/svg/
+
+================================================================
+
+I see the text "Vincent" which appeared originally on the screen of the calculator visually in the app icon file which was already packed in the images folder as I download the zip folder of the whole project overstacked as if all the letters pile up.
+
+Why don't you inline the fonts Lato and Parisienne by base64 as well?

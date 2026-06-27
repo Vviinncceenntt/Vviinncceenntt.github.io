@@ -1,0 +1,75 @@
+You're right on the edge of getting it working. Two things in play:
+
+## Issue 1 — The deep-link opened Expo Go but didn't carry the URL through
+
+This happens in newer Expo Go versions, especially when you weren't signed in at the moment you tapped Open. **Now that you're signed in AND Bonjour is installed, just restart and Expo Go will auto-discover your dev server.**
+
+### Do this:
+
+1. **Restart your PC** (Bonjour needs a reboot to take effect).
+2. After reboot, in `cmd`:
+   ```bash
+   cd C:\path\to\swiss-round-calculator\mobile
+   npx expo start --lan --clear
+   ```
+3. Wait until you see `› Metro waiting on exp://192.168.x.x:8081`.
+4. On your iPhone, open **Expo Go** while connected to the same Wi-Fi.
+5. On Expo Go's home tab, scroll down — you should see a **"Development servers"** or **"Projects"** section listing your machine name (something like `Vincent's PC`).
+6. **Tap that entry.** The bundle starts loading.
+
+If Bonjour worked, this is the smoothest path. No QR code, no URL typing.
+
+## Issue 2 — If Bonjour doesn't auto-discover
+
+There's a hidden trick: **Expo Go reads URLs from your iPhone clipboard.**
+
+1. In Safari on your iPhone, type the URL into the address bar:
+   ```
+   exp://192.168.x.x:8081
+   ```
+   (your real IP, your real port).
+2. **Long-press** the URL bar → **Copy**.
+3. Open Expo Go.
+4. A banner appears at the top: **"Open from clipboard: exp://…"** → tap it.
+
+Or directly: long-press the **Expo Go app icon** on your home screen → if it offers **"Paste & Open"**, tap that.
+
+## Issue 3 — The malformed QR code (separate fix)
+
+The "no finder squares, rectangles in middle" symptom means the **cmd window is rendering Unicode block characters with the wrong code page**. cmd.exe defaults to legacy CP-437/1252, which mangles the half-height blocks Expo uses to draw QR codes.
+
+### Quick fix (one shot per cmd session):
+Before starting Expo, run:
+```bash
+chcp 65001
+```
+This switches cmd to UTF-8. Now run `npx expo start --lan --clear` and the QR code will render with proper black-on-white finder squares.
+
+### Permanent fix (recommended):
+Use **Windows Terminal** instead of legacy `cmd.exe`. It's pre-installed on Windows 11:
+
+1. Press Windows key → type **"Terminal"** → open **Windows Terminal**.
+2. `cd C:\path\to\swiss-round-calculator\mobile`
+3. `npx expo start --lan --clear`
+
+Windows Terminal handles Unicode + colour + scrolling correctly. QR codes render perfectly, and you can scan them with the iPhone Camera app as originally intended.
+
+---
+
+## What to try in order
+
+1. **Restart your PC** (activate Bonjour) → `npx expo start --lan --clear` in Windows Terminal → tap your dev server in Expo Go's list.
+2. If no auto-discovery: copy `exp://192.168.x.x:8081` from Safari → open Expo Go → tap the clipboard banner.
+3. If you really want to scan a QR: use **Windows Terminal**, not cmd.exe.
+
+## What to expect once it connects
+
+Expo Go will show a progress bar from 0% → 100% — first load takes **30–90 seconds**. Then you should see the bilingual onboarding screen:
+
+> **瑞士制輪數計算機**
+> Swiss Round Calculator
+>
+> □ 本人已閱讀並同意以下文件：
+>   I have read and agree to the following documents:
+
+If anything red/yellow appears on the phone, **shake the phone**, tap "Copy" on the error overlay, paste it here and I'll diagnose. Same for any error in the Windows Terminal window.

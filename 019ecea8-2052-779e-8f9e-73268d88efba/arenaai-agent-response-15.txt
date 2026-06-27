@@ -1,0 +1,91 @@
+Real progress: the URL handoff works, so the only remaining problem is **the bundle download itself is timing out**. The most common cause on first run is that **Metro takes longer to build the bundle than iOS's HTTP client waits** (~60s). On a fresh project with 600+ dependencies and the 89 KB inline SVG, first build can easily hit 90-120 seconds.
+
+## Fix 1 (most likely) — Pre-warm the bundle from your PC browser
+
+While Metro is running, open this URL in **Chrome on your PC** (replace IP):
+
+```
+http://192.168.0.127:8081/index.bundle?platform=ios&dev=true&minify=false
+```
+
+Chrome will sit there for 60-180 seconds while Metro transforms every file. **Let it finish** — eventually the page fills with JavaScript text (you don't need to read it; just confirm it loaded). Now Metro has the bundle cached in RAM.
+
+Then immediately switch to your iPhone and open `exp://192.168.0.127:8081` again. This time the iPhone fetches the **already-built** bundle and downloads it in 5-15 seconds instead of triggering a fresh 90-second build.
+
+Watch the cmd window during the pre-warm — you should see progress like:
+```
+iOS Bundling   0/598 (1, 4 active)
+iOS Bundling 234/598 (87, 12 active)
+iOS Bundling complete in 87s
+```
+
+If you never see "Bundling complete", the bundle is actually failing (not just slow) and the cmd window will print the error.
+
+## Fix 2 — Slim the bundle for the first run
+
+The 89 KB inlined `p-writing.svg` is gigantic relative to everything else. You can temporarily swap it for a placeholder just to confirm the pipe works, then restore. In `mobile/src/components/BottomNav.js`:
+
+```js
+// temporary: comment out the heavy import while testing the pipe
+// import { pWriting, ... } from '../constants/icons';
+const pWriting = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>';
+```
+
+After Expo Go loads successfully once, revert it and reload via Expo Go's Reload button — subsequent loads use Metro's incremental cache and are fast.
+
+## Fix 3 — Disable Windows Defender real-time scanning on the project folder
+
+Defender scans every file Metro reads/writes, which can double bundle time on Windows. Add an exclusion:
+
+1. Windows Settings → **Privacy & Security** → **Windows Security** → **Virus & threat protection**
+2. Under "Virus & threat protection settings" → **Manage settings**
+3. Scroll to **Exclusions** → **Add or remove exclusions**
+4. **Add an exclusion → Folder** → select `C:\path\to\swiss-round-calculator`
+5. Also add: `C:\Users\<your-user>\AppData\Local\npm-cache`
+
+Then restart Metro: `npx expo start --lan --clear`.
+
+## Fix 4 — Fix the PowerShell execution policy (for future Windows Terminal use)
+
+The "security issue" you saw is PowerShell refusing to run npm/npx scripts. Run **once** as Administrator:
+
+1. Start menu → search "PowerShell" → right-click → **Run as administrator**
+2. Run:
+   ```powershell
+   Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+   ```
+3. Type `Y` when prompted.
+
+Future `npx` commands in Windows Terminal will work normally. Until then keep using Git Bash — it works fine.
+
+## Fix 5 — Confirm Bonjour took effect (auto-discovery)
+
+You said you installed Bonjour but didn't mention rebooting. **Reboot the PC.** After reboot, with `npx expo start --lan --clear` running, your machine name should appear under "Development servers" in Expo Go without any URL typing or QR scanning.
+
+---
+
+## What to do right now
+
+In order:
+
+1. **Reboot your PC** (activates Bonjour, clears any half-terminated Metro processes).
+2. Add the project folder to **Windows Defender exclusions** (Fix 3).
+3. Open Git Bash:
+   ```bash
+   cd /c/path/to/swiss-round-calculator/mobile
+   npx expo start --lan --clear
+   ```
+4. **Pre-warm in Chrome on PC**: open
+   `http://192.168.0.127:8081/index.bundle?platform=ios&dev=true&minify=false`
+   Wait until the page fills with text (or cmd shows "Bundling complete").
+5. **On iPhone Safari**: open `exp://192.168.0.127:8081`, tap Go, accept the Expo Go handoff.
+6. The bundle should now download in 5-15 s and the **瑞士制輪數計算機** onboarding screen should appear.
+
+## If it still times out after pre-warming
+
+Then it's not bundle size — it's network. Tell me:
+
+1. Did Chrome's pre-warm URL succeed? (Did the page fill with JS text, or also time out?)
+2. What does the **last 30 lines** of the Git Bash Metro window show right after the iPhone times out? Paste them here verbatim.
+
+That will pin down whether it's a JS error, a missing native module, or a genuine network drop.

@@ -1,0 +1,108 @@
+Ah — then the font issue is different. The fonts are physically there in your `web/assets/fonts/` folder (subset, real glyphs, ~960 KB total). The problem is Safari isn't loading them. Three likely causes for Safari-but-not-Chrome:
+
+## Diagnose first — what does Safari actually see?
+
+On your iPhone Safari, while the calculator page is open, open a **second** tab and visit:
+
+```
+http://192.168.0.127:8765/assets/fonts/ChironSungHK.ttf
+```
+
+| Result | Cause | Fix |
+|---|---|---|
+| Downloads a ~265 KB file | Network OK → CSS / MIME issue | Section A below |
+| Downloads a ~260-byte file (or "0 KB") | Old placeholder still served | Section B |
+| 404 / "page not found" | Wrong path | Section C |
+| Times out | Firewall / IP changed again | Re-test `/status` first |
+
+## Section A — Network OK but font still missing on Safari
+
+Python's `http.server` may serve TTF/WOFF2 with a wrong `Content-Type`, and Safari is **stricter than Chrome about font MIME types**. Quick test: visit
+
+```
+http://192.168.0.127:8765/index.html
+```
+
+…then in the Web Inspector on iPhone (see "Enabling Inspector" below) check the Console for messages like:
+
+```
+Failed to decode downloaded font
+OTS parsing error: invalid version tag
+```
+
+If you see those, it's the MIME issue. **Fix without enabling MIME types**: just use `npx serve` instead of Python — it sets the right headers automatically:
+
+```bash
+cd /c/path/to/swiss-round-calculator/web
+npx serve . -l 8765 --cors
+```
+
+(First run installs `serve`; type `y` when prompted.) Restart Safari, refresh — fonts should appear.
+
+### Or fix Python itself
+Create a tiny helper script `web/serve.py` that registers font MIME types:
+
+Then in Git Bash:
+
+```bash
+cd /c/path/to/swiss-round-calculator/web
+python serve.py
+```
+
+This wraps `http.server` with the right MIME types, forces IPv4, and adds CORS headers — fonts will load correctly in Safari.
+
+## Section B — Old placeholder still being served
+
+If the TTF download is only a few hundred bytes:
+- The `web/assets/fonts/` you populated isn't the one being served.
+- OR your Git pull / commit didn't transfer the real files.
+
+Check sizes on Windows. In Git Bash inside the `web/assets/fonts/` folder:
+
+```bash
+ls -la
+```
+
+You should see something like:
+```
+-rw-r--r-- 1 ... 265588 ... ChironSungHK.ttf
+-rw-r--r-- 1 ... 193680 ... ChironHeiHK.ttf
+-rw-r--r-- 1 ... 237980 ... ChironGoRoundTC.ttf
+-rw-r--r-- 1 ... 271268 ... ThePeakFontPlus.ttf
+-rw-r--r-- 1 ... 113916 ... ChironSungHK.woff2   ← from v1.0.8
+-rw-r--r-- 1 ...  84712 ... ChironHeiHK.woff2
+-rw-r--r-- 1 ... 100096 ... ChironGoRoundTC.woff2
+-rw-r--r-- 1 ... 155460 ... ThePeakFontPlus.woff2
+```
+
+If any TTF is smaller than ~150 KB, that's a placeholder. Tell me the actual sizes and we'll re-subset.
+
+## Section C — 404 / wrong path
+
+Check that `web/assets/fonts/ChironSungHK.ttf` and `web/css/fonts.css` exist (case-sensitive):
+
+```bash
+ls /c/path/to/swiss-round-calculator/web/css/fonts.css
+ls /c/path/to/swiss-round-calculator/web/assets/fonts/
+```
+
+`fonts.css` references `../assets/fonts/X.woff2`, so from a request to `/css/fonts.css`, the relative path resolves to `/assets/fonts/X.woff2`. If the `assets` folder is mis-cased on disk (Windows is case-insensitive but the web server may still be case-sensitive in URL matching), Safari fails to load while Chrome's tolerant heuristics save it.
+
+## Enabling iPhone Safari Web Inspector (for diagnosing)
+
+If you want to see exactly what Safari complains about:
+
+1. On iPhone: **Settings → Safari → Advanced → Web Inspector** → **ON**.
+2. Connect iPhone to PC via Lightning/USB-C cable.
+3. On Windows: Web Inspector requires a Mac for the desktop side. Alternative — use **Inspect.dev** (free trial), or just enable **Settings → Safari → Advanced → Show Develop menu** on iPhone, then tap the URL bar → bottom toolbar shows a 🔧 wrench icon → tap → **Show Web Inspector** lite view appears with a Console tab.
+
+## TL;DR
+
+1. **First**, on iPhone Safari visit `http://192.168.0.127:8765/assets/fonts/ChironSungHK.ttf` and tell me what happens (downloads a file of what size? 404? times out?).
+2. While we wait, **stop your current Python server**, then in Git Bash:
+   ```bash
+   cd /c/path/to/swiss-round-calculator/web
+   python serve.py
+   ```
+   Refresh Safari. The new MIME types may be all you need.
+3. If still broken, paste the directory listing of `web/assets/fonts/`.

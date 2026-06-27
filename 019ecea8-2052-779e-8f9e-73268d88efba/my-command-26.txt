@@ -1,0 +1,3 @@
+I already uploaded the ttf fonts with licenses placed in the same roots onto Github since the very first version of the project. I used ttf file instead of woff or similar type because I would like to have perfect generation of svg files which contain the custom fonts.
+
+On the source webpage on Github such as [https://vviinncceenntt.github.io/wongssystem.html](https://vviinncceenntt.github.io/wongssystem.html) I use block(I did try swap before but rendering sometimes the font and sometimes fallback system font) for font-display. I suggest you to use block instead of swap as I see I don't mind if it takes some time but I mind if it works only sometimes.

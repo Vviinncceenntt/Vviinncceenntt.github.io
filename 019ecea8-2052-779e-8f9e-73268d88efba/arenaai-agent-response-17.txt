@@ -1,0 +1,80 @@
+Two key observations:
+
+**1. The QR code you just pasted IS properly formed.** Look at the three solid corner squares — top-left, top-right, bottom-left. Those are the finder patterns. The earlier malformed QR was probably an artefact of the font Git Bash uses in some scrollback states. **Try scanning this one with the iPhone Camera app right now** — it should work.
+
+**2. The LAN may have changed under you.** Safari timing out on `http://192.168.0.127:8081` (when `/status` worked an hour ago) almost always means your PC's IP changed. Home routers reassign DHCP leases every few hours.
+
+## Do these in order
+
+### A — Confirm the IP is still valid (30 s)
+
+```bash
+ipconfig
+```
+
+Look at the **Wireless LAN adapter Wi-Fi → IPv4 Address** line. **If it's no longer `192.168.0.127`**, that's the whole problem. Use the new one. To prevent this from happening again, set a DHCP reservation in your router admin, or assign your PC a static IP.
+
+Also re-test `/status` from iPhone Safari with whatever IP `ipconfig` shows:
+
+```
+http://<current-ip>:8081/status
+```
+
+- ✅ Returns the 23-byte file → LAN path is open. Go to step B.
+- ❌ Times out → it's the firewall/IP/router again. Stop and fix that first.
+
+### B — Try scanning the just-generated QR (10 s)
+
+The QR in your last message has the right pattern. With Metro still running:
+- Hold your iPhone steady about 20 cm from the screen
+- Open the Camera app
+- Point at the QR — wait 3-5 seconds (don't move)
+- Yellow banner pops up → tap → opens Expo Go
+
+If that hangs the same way as the manifest fetch, jump to step C.
+
+### C — Fall back to ngrok tunnel (1-2 min setup)
+
+Your LAN is clearly unreliable in this environment (timing out intermittently). The ngrok tunnel is HTTPS and works through any network. You already have `@expo/ngrok` installed from earlier.
+
+```bash
+cd /c/path/to/swiss-round-calculator/mobile
+export REACT_NATIVE_PACKAGER_HOSTNAME=     # clear it so tunnel takes over
+npx expo start --tunnel --clear
+```
+
+(Empty `=` unsets the variable in Git Bash so tunnel can pick its own host.)
+
+ngrok will print a different QR code with a long `https://...ngrok.io` URL. Scan with Camera, or open the printed `exp://...` URL in Safari. Bundle delivery via tunnel is slower (60-120 s) but very reliable — once it gets through once, Metro's cache makes subsequent reloads quick.
+
+### D — If the bundle still never reaches your iPhone
+
+Tell me:
+1. Output of `ipconfig` (Wi-Fi section only, mask last octet if you like).
+2. Result of `curl http://<your-ip>:8081/status` from a **second cmd window on your PC** (not from the phone) — should print `packager-status:running`.
+3. Whether the QR generated in tunnel mode starts with `https://` (good) or `exp://192.168...` (LAN; means tunnel didn't activate).
+
+## Why your earlier "exp:// in Safari → Expo Go → timeout" happened
+
+Expo Go fetches **two** things after the `exp://` handoff:
+1. A manifest from `http://your-ip:8081/` (small JSON, ~2 KB)
+2. The bundle from `http://your-ip:8081/index.bundle?...` (large JS, ~5 MB on first build)
+
+For request **1** to succeed, the iPhone must reach `http://your-ip:8081/`. You just confirmed Safari can't reach that — so Expo Go can't either. The "timeout" you saw was step 1 failing, not the bundle. That's why **nothing ever appeared in the Metro window**: the request didn't get there.
+
+`/status` and `/` go through the same TCP socket, so if one works and the other doesn't, it's not a routing issue — it's that **the connection drops between them**. Causes:
+- Wi-Fi adapter sleeping between requests
+- Router AP isolation kicking in (some routers do it sporadically)
+- IP changed mid-session
+
+A reboot of your PC + iPhone Wi-Fi off/on resets all of these. Try that before going further.
+
+## TL;DR
+
+1. **Reboot PC** (final Bonjour activation) and **toggle iPhone Wi-Fi** off/on.
+2. `ipconfig` → confirm IP.
+3. Start Metro: `cd mobile && npx expo start --lan --clear`.
+4. iPhone Camera app → scan the QR.
+5. If still timeout → fall back to **`npx expo start --tunnel --clear`** and scan that QR instead.
+
+Paste me the `ipconfig` output and the result of step 4 if it still fails.

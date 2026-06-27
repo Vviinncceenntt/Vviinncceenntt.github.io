@@ -1,0 +1,69 @@
+🎉 You're in! Both Chrome on PC and Safari on iPhone are loading the calculator. The first iPhone attempt timed out because Safari was still trying to reach the IPv6-only socket from before the `--bind 0.0.0.0` restart; once it retried, your new firewall rule + IPv4 binding let it through.
+
+## What you can do right now on the iPhone
+
+The full **web build** of the calculator is live for you. Walk through these to verify everything I built:
+
+### Onboarding screen
+- Tap the four legal document links — each opens in Safari in a new tab.
+- Tick the **"I Agree"** checkbox — "I Accept" turns from grey to blue.
+- Tap **"I Accept"** — goes straight to the dashboard (the web build skips the RevenueCat check by design).
+
+### Main dashboard
+1. **Section 1 (Tournament Parameters)** — change n, p, d via the ▲▼ steppers; Sections 2-4 update within ~100 ms (the throttle).
+2. **Section 2 (Specific Results)** — outputs reflect your inputs; tap **複製輸出** or **Copy Output** to copy the bilingual summary string.
+3. **Section 3 (Reverse Round Lookup)** — type a value for r; supported range + tolerable losses update live.
+4. **Section 4 (Matrix Tableau)** — scroll horizontally. The column containing your n should glow **blue**; any columns inside the Section-3 player range should glow **red**; overlap shows both. Tap the matrix subtitle text to see the "Varies with Top (p=…)" tooltip.
+5. **Tooltips** — tap any field label (n, p, d, Rounds, etc.) to see the bilingual description. Note that `<r>`, `<p>`, `<n>` placeholders are substituted with your live values.
+
+### Bottom navigation
+- **公式 / Functions** — opens the MathJax-rendered formula page in an iframe.
+- **設定 / Settings** — toggle the theme switch (zh-on-top-of-en labels). Drag the triangular orientation slider knob between Auto / Landscape Left / Portrait vertices. Tap Restore / Reset / Manage Subscription.
+- **法律 / Legal** — switch between PP / EULA / T&C / Disclaimer tabs.
+- **黃氏計分法 / Wong system** — opens the Wong scoring system page.
+- All four close with the **✕** button.
+
+### Dark mode
+- Open Settings → flip the theme toggle. The whole app, including the matrix tableau gradients and the iframe contents in the four menus, switch to dark.
+
+## When you're ready to publish
+
+The web folder is **production-ready as-is**. Two zero-effort hosting options:
+
+### Option 1 — GitHub Pages (free, fits your repo URL pattern)
+```bash
+cd swiss-round-calculator
+git remote add origin https://github.com/Vviinncceenntt/swiss-round-calculator.git
+git push -u origin master --tags
+```
+Then in GitHub repo settings → Pages → Source: `master` branch → `/web` folder → Save. Your site lives at `https://vviinncceenntt.github.io/swiss-round-calculator/`.
+
+### Option 2 — Any static host
+Upload the contents of `web/` to Netlify, Cloudflare Pages, Vercel, S3, your shared hosting, anything. No build step required.
+
+## For the iOS App Store binary
+
+When you eventually want the App Store version (the version with auto-renewing subscription, haptics, orientation lock, etc.):
+
+```bash
+cd /c/path/to/swiss-round-calculator/mobile
+npm install -g eas-cli
+npx expo login        # use your EMAIL not username
+eas init
+eas build --profile production --platform ios
+eas submit --platform ios
+```
+
+EAS builds it on Apple's cloud servers; you never need a Mac. ~20 minutes compile, then EAS uploads it directly to App Store Connect.
+
+For Google Play, same idea:
+```bash
+eas build --profile production --platform android
+eas submit --platform android
+```
+
+## TL;DR
+
+You now have a working bilingual Swiss Round Calculator running on your iPhone 11 Pro via Safari, served from your Windows PC. The web build is **functionally complete and ready for public deployment**. The native iOS/Android builds go through EAS Build when you're ready to ship to the App Store / Google Play.
+
+Enjoy clicking around! If you spot any visual or behavioural issue while testing on the phone (anything that doesn't match the spec), tell me and I'll fix it.

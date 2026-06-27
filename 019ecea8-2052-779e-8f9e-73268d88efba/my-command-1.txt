@@ -1,0 +1,507 @@
+Design a fully mobile-responsive, bilingual, with written traditional Chinese in Hong Kong style on top of British English line by line, responsive calculator for both website to be hosted, without Ads, on public server as well as App to be sold, without Ads, by yearly auto-renewal subscription on iOS and Android app stores. It is a calculator of which the function includes computing the minimum and maximum rounds of a Swiss tournament, thus reversely finding out the range of the numbers of players which a specific number of rounds supports. Provide complete codes(both ready-to-upload HTML/CSS/Javascript for hosting on public server as well as ready-to-compile React Native for building with EAS Build in separate folders) for:
+
+Bottom navigation (4 destinations, each with an icon and text label: Mathematical Algorithms(Popup notification showing functions), Settings(Toggle between light and dark themes, Restore Purchase, Reset parameters in the main dashboard, Lock or unlock orientations), GDPR compliance(Popup notification with tabs showing full texts of Privacy Policy, EULA, terms, and disclaimer), an "About" page(Popup notification showing text))
+
+Onboarding screen with validation (Only create an "I Agree" checkbox to require user to agree to linked Privacy Policy(with URL [https://vviinncceenntt.github.io/swiss-round-calculator/privacy-policy.html](https://vviinncceenntt.github.io/swiss-round-calculator/privacy-policy.html)), End-User License Agreement(with URL [https://vviinncceenntt.github.io/swiss-round-calculator/eula.html](https://vviinncceenntt.github.io/swiss-round-calculator/eula.html)), Terms and Conditions(with URL [https://vviinncceenntt.github.io/swiss-round-calculator/terms.html](https://vviinncceenntt.github.io/swiss-round-calculator/terms.html)), and Disclaimer(with URL [https://vviinncceenntt.github.io/swiss-round-calculator/disclaimer.html](https://vviinncceenntt.github.io/swiss-round-calculator/disclaimer.html)), without collecting any usernames, though user location might be collected for determining local time zone and currency for RevenueCat to check subscription and price.)
+
+Main dashboard with real-time data fetch (Use throttling(set to ~100ms), if necessary, to avoid high-frequency updates that cause re-renders. Do not display offline fallback date and time under the title of the main dashboard. If it is necessary to do so, attempt to display them on the onboard validation page where subscription of this app is checked by RevenueCat upon clicking/tapping the "I Agree" checkbox.)
+
+Settings with local storage (AsyncStorage) (Light and dark themes, Restore Purchase, RevenueCat, Orientation lock, MathJax, Legal menu)
+
+Include folder structure, package.json, and App.js entry point.
+
+I would like the Paywall appears only when the user clicks/taps the "I accept" button(grayed out until the "I Agree" checkbox is clicked/tapped)(fire Haptics onTapped) on the onboarding screen and only after RevenueCat has checked the subscription status to find out that the user has not subscribed or the subscription is expired, to fulfil GDPR requirements, not when the screen is loaded. I want RevenueCat to check the subscription status(I only offer one plan which is an annual subscription(auto-renew if the user does not cancel the subscription manually 24 hours before the end of subscription period) to which the user subscribe to extend the availability for a year) when the "I agree" checkbox is clicked/tapped. It should give user a reminder(alert), which also reminds the user of any price change(new price is subject to user's affirmation), that the subscription is going to expire on a certain date if it finds the date that the user opens the app is less than 1 month(by using setMonth) before the end of the subscription period and the reminder should have a button("Extend Subscription") for subscription extension beside the "OK" button. It should proceed to the main dashboard without showing the Paywall or the reminder if it finds the date is 1 month or more. It should check the subscription status again after the purchase is handled and alert message, which should not persist all the way, for any errors if the users cancel the purchase or the subscription fails, and then redirect to the onboarding screen. It should also allow the user to continue to use the app when it is offline so that the user can restore purchase via the restore purchase button in the setting menu. 30HKD (don't hard code!) is the base price. The Paywall should inform the user that the subscription renews automatically unless cancelled 24 hours before expiry and can be cancelled anytime in Google Play/App Store(depending on device(check OS first upon user clicking/tapping "I accept" button)) settings. You do not need to explicitly show on screen that which region and currency you have detected as they are only determined for RevenueCat or Store server uses. The Paywall and all the alert, warn, error messages and buttons need to be bilingual, with written traditional Chinese in Hong Kong style on top of British English, too.
+
+Below I am telling you the layout of the main dashboard with specific bilingual naming:
+
+Title:
+
+'瑞士制輪數計算機'
+
+'Swiss Round Calculator'
+
+Then, there will be 5 sections, containers, each has a subtitle followed by some items with input boxes, with up&amp;down buttons, where the user can input numbers for calculation, or output boxes, except the second last section which is a table and the last section for note, the content of which is text in paragraph form only. For some items, and the title of the table, I would like to have a description by the means of a tooltip on mouse hover and on keyboard focus on desktop and by the means of a toggletip on tap on mobile. After the last section of note, there will be a footnote where I make my claim. There will be two buttons, one in Chinese and the other in English, that a text string will be written to clipboard on click/tap after the last item or the last box, if there is one, of Section 2.
+
+Section 1 title:
+
+'賽事參數'
+
+'Tournament Parameters'
+
+Item 1 name:
+
+'人數'
+
+'Number of Players'
+
+'(n)'
+
+Item 1 description:
+
+'參賽人數（至少為4且必須是正整數）'
+
+'Total Number of Players (at least 4 and must be positive integer)'
+
+Item 2 name:
+
+'頂層選手數目'
+
+'Placements at the top'
+
+'(p)'
+
+Item 2 description:
+
+'頂層需準確地決出名次的人數（至多等於n且必須是正整數）'
+
+'Accurate Ranks to determine (at most equals to n and must be positive integer)'
+
+Item 3 name:
+
+'積分層距離'
+
+'Score Group Distance'
+
+'(d)'
+
+Item 3 description:
+
+'自尾二輪開始避免頂層選手遇上積分層距離達d（至少為2且必須是正整數）的對手'
+
+'Score Group Distance (at least 2 and must be positive integer) of the opponents against whom the top p players not to play starting from the second last round'
+
+Section 2 title:
+
+'特定結果'
+
+'Specific Results'
+
+Item 1 name:
+
+'輪數'
+
+'Rounds'
+
+'(Rmin - Rmax)'
+
+Item 1 description:
+
+'準確地決出首&lt;p&gt;名選手所需的最少輪數及建議的最多輪數而超過此數目的輪數將屬多餘'
+
+'Minimum number of rounds required to accurately determine top &lt;p&gt; placements and Maximum number of rounds recommended that more rounds beyond the number are redundant'
+
+Item 2 name:
+
+'淘汰賽輪數'
+
+'Elimination Rounds'
+
+'(ERmin - ERmax)'
+
+Item 2 description:
+
+'在對應的最少及最多輪數下，建議附加的淘汰賽輪數'
+
+'Suggested numbers of elimination rounds that go beyond the Swiss rounds for the respective minimum and maximum rounds'
+
+Item 3 name:
+
+'能容許的最多負局數'
+
+'Tolerable Maximum Losses'
+
+'(LmaxRmin - LmaxRmax)'
+
+Item 3 description:
+
+'在對應的最少及最多輪數下，選手為擠身頂層所能容許的最多負局數'
+
+'Maximum number of losses that a player could tolerate to secure a placement in the top &lt;p&gt; for the respective minimum and maximum rounds'
+
+Section 2 Chinese button:
+
+'複製輸出'
+
+Chinese button text string:
+
+'從&lt;n&gt;名參賽者中準確地決出首&lt;p&gt;名選手至少需要&lt;Rmin&gt;輪，但不建議多於&lt;Rmax&gt;輪。'
+
+Section 2 English button:
+
+'Copy Output'
+
+English button text string:
+
+'To accurately determine top &lt;p&gt; players out of &lt;n&gt; participants, it takes at least &lt;Rmin&gt; rounds, though more than &lt;Rmax&gt; is not recommended.'
+
+Section 3 title:
+
+'輪數逆向搜索'
+
+'Reverse Round Lookup'
+
+Item 1 name:
+
+'輪數'
+
+'Rounds'
+
+'(r)'
+
+Item 1 description:
+
+'（至少為3且必須是正整數）'
+
+'(at least 3 and must be positive integer)'
+
+Item 2 name:
+
+'支援人數範圍'
+
+'Supported Player Range'
+
+'(Nmin - Nmax)'
+
+Item 2 description:
+
+'在對應輸入的&lt;r&gt;輪下，需要準確地決出首&lt;p&gt;名選手，可以接受的最少與最多參賽人數'
+
+'Minimum and Maximum number of players accepted to accurately determine top &lt;p&gt; placements for the respective input &lt;r&gt; rounds'
+
+Item 3 name:
+
+'能容許的最多負局數'
+
+'Tolerable Maximum Losses'
+
+'(LmaxNmin - Lmax - LmaxNmax)'
+
+Item 3 description:
+
+'在對應輸入的&lt;n&gt;人或最少或最多支援人數及&lt;r&gt;輪下，選手為擠身頂層所能容許的最多負局數'
+
+'Maximum number of losses that a player could tolerate to secure a placement in the top &lt;p&gt; for the respective input &lt;n&gt; players or minimum or maximum supported players and input &lt;r&gt; rounds'
+
+Here follows the tableau, a table, which integrates the resulting rounds by computing numbers of players to show the matrix of the ranges of numbers of players and the respective ranges of numbers of rounds and numbers of losses.
+
+Section 4 title:
+
+'對應的輪數與人數範圍矩陣表'
+
+'Corresponding Matrix Tableau of Rounds and Player Ranges'
+
+Section 4 title description:
+
+'隨頂層選手數目（p=&lt;p&gt;）變化'
+
+'Varies with Top (p=&lt;p&gt;) Placements'
+
+Freezed First Column:
+
+Row 1 Cell 1 name:
+
+'輪數'
+
+'Rounds'
+
+'(Rmin - Rmax)'
+
+Row 1 Cell 1 description:
+
+'準確地決出首&lt;p&gt;名選手所需的最少輪數及建議的最多輪數而超過此數目的輪數將屬多餘'
+
+'Minimum number of rounds required to accurately determine top &lt;p&gt; placements and Maximum number of rounds recommended that more rounds beyond the number are redundant'
+
+Row 2 Cell 1 name:
+
+'淘汰賽輪數'
+
+'Elimination Rounds'
+
+'(ERmin - ERmax)'
+
+Row 2 Cell 1 description:
+
+'在對應的最少及最多輪數下，建議附加的淘汰賽輪數'
+
+'Suggested numbers of elimination rounds that go beyond the Swiss rounds for the respective minimum and maximum rounds'
+
+Row 3 Cell 1 name:
+
+'最多負局數'
+
+'Maximum Losses'
+
+'(LmaxRmin - LmaxRmax)'
+
+Row 3 Cell 1 description:
+
+'在對應的最少及最多輪數下，選手為擠身頂層所能容許的最多負局數'
+
+'Maximum number of losses that a player could tolerate to secure a placement in the top &lt;p&gt; for the respective minimum and maximum rounds'
+
+Row 4 Cell 1 name:
+
+'人數範圍'
+
+'Player Range'
+
+There should be 2 numbers, the minimum number of players and the maximum number of players that share the same minimum and maximum numbers of rounds, elimination rounds, and respective maximum losses, for the row of Player Range.
+
+For display purpose, generate only the columns between 6 or p whichever is bigger to 6144 players to prevent resource exhaustion by generating indefinite columns. However, this does not imply that the function about Supported Player Range should be restricted to the range of 6 to 6144.
+
+The texts in the First Column of the table should not have a slash to separate English from Chinese but have Chinese on top of English, like all other texts.
+
+Section 5 title:
+
+'備註：'
+
+'Note:'
+
+Paragraph 1:
+
+'為保守起見，即使存在和局，仍使用無和局的二項式分佈公式，因為和局會使積分分佈更為分散，從而減少頂層的選手數量——因此，即使有和局發生，將其作為下界也是安全的。'
+
+'The no-draw binomial formula is used for conservative reason even when draws exist because draws spread the point distribution more, reducing the number of players at the top — so it's safe to use as a lower bound even when draws occur.'
+
+Paragraph 2:
+
+'在假設勝、和、負結果的概率時，這裏簡單地採用了二項式分佈，而不是複雜的多項式分佈或常態分佈。'
+
+'The binomial distribution is taken for simplicity reason instead of the complex multinomial distribution or the complicated normal distribution in assuming the probability of the results of wins, draws, and losses.'
+
+Paragraph 3:
+
+'這裏假設計分制使用了標準的1-0.5-0制。分出勝負的對局與和局的得分不一樣的計分制，或負局得分不是0的，則不限於此公式。'
+
+'The point-scoring system of 1-0.5-0 is assumed. This formula does not apply to point-scoring systems where the total score of a decisive game is not the same as the total score of a draw game, or if there is a non-zero loss score.'
+
+Default value of input boxes:
+
+n: 193 (valid input values: 4 to 5001, positive integer; no signs, symbols, emojis or special characters)
+
+p: 8 (valid input values: 1 to 5001, positive integer; no signs, symbols, emojis or special characters)
+
+d: 4 (valid input values: 2 to 9999, positive integer; no signs, symbols, emojis or special characters)
+
+Default placeholder of input box:
+
+r: 12 (valid input values: 3 to 5001, positive integer; no signs, symbols, emojis or special characters)
+
+Footnote:
+
+'本應用程式由黃汶聰編寫及設計。版權所有 © 2026 黃汶聰。保留所有權利。'
+
+'This app is written and designed by Man Chong Wong. Copyright © 2026 Man Chong Wong. All rights reserved.'
+
+Bottom navigation:
+
+Destination 1:
+
+Icon: SVG '[https://raw.githubusercontent.com/Vviinncceenntt/icons/main/formula-fx-icon.svg](https://raw.githubusercontent.com/Vviinncceenntt/icons/main/formula-fx-icon.svg)'
+
+Chinese text label and menu title: '公式'
+
+English text label and menu title: 'Functions'
+
+Content: Get element from [https://vviinncceenntt.github.io/swiss-round-calculator/functions.html](https://vviinncceenntt.github.io/swiss-round-calculator/functions.html) and store it locally for offline fallback caching, but mirroring(use iframe if other options are unsatisfactory) the Github page is preferred as the primary option. Download MathJax script from jsDelivr CDN to render the math equations. Store MathJax script locally for Offline Caching. Remember to protect commands with single backslash from vanishing during compilation by converting them into double-escaped format.
+
+Destination 2:
+
+Icon: SVG '[https://raw.githubusercontent.com/Vviinncceenntt/icons/main/gear-icon-72a7cf.svg](https://raw.githubusercontent.com/Vviinncceenntt/icons/main/gear-icon-72a7cf.svg)'
+
+Chinese text label and menu title: '設定'
+
+English text label and menu title: 'Settings'
+
+Content: Light and Dark mode toggle switch, Orientation triangle-shaped 3-state toggle switch (unlocked (auto-rotate between only Landscape Left Orientation and Portrait Orientation because Landscape Right Orientation and Upside Down Orientation disabled) (default option though the app starts in Landscape Left Orientation) being on the tip-top of triangle, locked on Landscape Left Orientation being on the bottom left of triangle, locked on Portrait Orientation being on the bottom right of triangle) (the switch is grayed out in web environment because it does not apply to web environment), Restore Purchase button, Reset button, Subscription management button(instructional text: "在裝置設定中管理或取消訂閱項目"(traditional Chinese) and "Manage or cancel subscriptions in your device settings"(British English) (Chinese on top of English)) linking to '[https://apps.apple.com/account/subscriptions](https://apps.apple.com/account/subscriptions)' or '[https://play.google.com/store/account/subscriptions](https://play.google.com/store/account/subscriptions)' by system actions rather than a regular browser view, version number(1.0.0), all texts bilingual. Use '恢復購買' as the Chinese term for 'Restore Purchase'.
+
+Destination 3:
+
+Icon: SVG '[https://raw.githubusercontent.com/Vviinncceenntt/icons/main/p-writing.svg](https://raw.githubusercontent.com/Vviinncceenntt/icons/main/p-writing.svg)'
+
+Chinese text label and menu title: '法律'
+
+English text label and menu title: 'Legal'
+
+Privacy Policy Chinese tab name: '私隱權政策'
+
+Privacy Policy English tab name: 'PP'
+
+Privacy Policy tab Content: Get element from '[https://vviinncceenntt.github.io/swiss-round-calculator/privacy-policy.html](https://vviinncceenntt.github.io/swiss-round-calculator/privacy-policy.html)' and store it locally for offline fallback caching, but mirroring(use iframe if other options are unsatisfactory) the Github page is preferred as the primary option. State in both languages at the start of the page that only English version is available.
+
+End-User License Agreement Chinese tab name: '終端使用者授權合約'
+
+End-User License Agreement English tab name: 'EULA'
+
+End-User License Agreement tab Content: Get element from '[https://vviinncceenntt.github.io/swiss-round-calculator/eula.html](https://vviinncceenntt.github.io/swiss-round-calculator/eula.html)' and store it locally for offline fallback caching, but mirroring(use iframe if other options are unsatisfactory) the Github page is preferred as the primary option. State in both languages at the start of the page that only English version is available.
+
+Terms and Conditions Chinese tab name: '條款及細則'
+
+Terms and Conditions English tab name: 'T&amp;C'
+
+Terms and Conditions tab Content: Get element from '[https://vviinncceenntt.github.io/swiss-round-calculator/terms.html](https://vviinncceenntt.github.io/swiss-round-calculator/terms.html)' and store it locally for offline fallback caching, but mirroring(use iframe if other options are unsatisfactory) the Github page is preferred as the primary option. State in both languages at the start of the page that only English version is available.
+
+Disclaimer Chinese tab name: '免責聲明'
+
+Disclaimer English tab name: 'Disclaimer'
+
+Disclaimer tab Content: Get element from '[https://vviinncceenntt.github.io/swiss-round-calculator/disclaimer.html](https://vviinncceenntt.github.io/swiss-round-calculator/disclaimer.html)' and store it locally for offline fallback caching, but mirroring(use iframe if other options are unsatisfactory) the Github page is preferred as the primary option. State in both languages at the start of the page that only English version is available.
+
+Destination 4:
+
+Icon: SVG '[https://raw.githubusercontent.com/Vviinncceenntt/icons/main/pasted-image-20240416184020.svg](https://raw.githubusercontent.com/Vviinncceenntt/icons/main/pasted-image-20240416184020.svg)'
+
+Chinese text label and menu title: '黃氏計分法'
+
+Englsih text label and menu title: 'Wong system'
+
+Content: Get element from '[https://vviinncceenntt.github.io/wongssystem.html](https://vviinncceenntt.github.io/wongssystem.html)', mirroring(use iframe if other options are unsatisfactory) the Github page.
+
+Use buttons with a cross instead of buttons with the English word "close" for closing popup notifications.
+
+While scrolling through the sections on mobile browser in web environment is just like scrolling through the sections on desktop browser in web environment, I want that the user swipes(up and down in Landscape Left Orientation(default orientation at app start) and left and right in Portrait Orientation, Landscape Right Orientation and Upside Down Orientation disabled) across the title, the 5 sections, and the footnote in React Native environment.
+
+Reference the following master svg files in app.json for later EAS Build. If unavoidable, create master png files of app icon(1024 px x 1024 px) and Launch Screens(2732 px x 2732 px) for eventual generations of png files of app icon and Launch Screens and Splash Screens of all dimensions of all devices. To preserve pixel quality and to avoid blurry edges, convert svg files to vector-based pdf files in sRGB as intermediary files first before converting them to 32-bit png files. Save them under assets/images/.
+
+Master file for app icon generation: SVG '[https://vviinncceenntt.github.io/swiss-round-calculator/appiconmastersvg.svg](https://vviinncceenntt.github.io/swiss-round-calculator/appiconmastersvg.svg)'
+
+Master file for light mode Landscape Orientation Launch Screen and Splash Screen generation: SVG '[https://vviinncceenntt.github.io/swiss-round-calculator/splashscreenlandscapelightmastersvg.svg](https://vviinncceenntt.github.io/swiss-round-calculator/splashscreenlandscapelightmastersvg.svg)'
+
+Master file for dark mode Landscape Orientation Launch Screen and Splash Screen generation: SVG '[https://vviinncceenntt.github.io/swiss-round-calculator/splashscreenlandscapedarkmastersvg.svg](https://vviinncceenntt.github.io/swiss-round-calculator/splashscreenlandscapedarkmastersvg.svg)'
+
+Master file for light mode Portrait Orientation Launch Screen and Splash Screen generation: SVG '[https://vviinncceenntt.github.io/swiss-round-calculator/splashscreenportraitlightmastersvg.svg](https://vviinncceenntt.github.io/swiss-round-calculator/splashscreenportraitlightmastersvg.svg)'
+
+Master file for dark mode Portrait Orientation Launch Screen and Splash Screen generation: SVG '[https://vviinncceenntt.github.io/swiss-round-calculator/splashscreenportraitdarkmastersvg.svg](https://vviinncceenntt.github.io/swiss-round-calculator/splashscreenportraitdarkmastersvg.svg)'
+
+Master file for light mode Android 12+ Splash Screen (to accommodate Android 12+ Splash Screen API) generation: SVG '[https://vviinncceenntt.github.io/swiss-round-calculator/splashscreenandroid12lightmastersvg.svg](https://vviinncceenntt.github.io/swiss-round-calculator/splashscreenandroid12lightmastersvg.svg)'
+
+Master file for dark mode Android 12+ Splash Screen (to accommodate Android 12+ Splash Screen API) generation: SVG '[https://vviinncceenntt.github.io/swiss-round-calculator/splashscreenandroid12darkmastersvg.svg](https://vviinncceenntt.github.io/swiss-round-calculator/splashscreenandroid12darkmastersvg.svg)'
+
+Style:
+
+All input boxes of the same section should be aligned to the same level. All output boxes of the same section should be aligned to the same level.
+
+Text in paragraph form should be left justified.
+
+For the table in Section 4, background colour should be beige (#F5F5DC) in light mode, buff (#F0DC82) in dark mode. Highlight the column corresponding to the input Number of Players in Section 1 with diagonal colour gradient from top left corner of cell 1 true blue (#0000FF) to midpoint light blue (#ADD8E6) to bottom right corner of cell 4 true blue (#0000FF) in light mode, from top right corner of cell 1 true blue (#0000FF) to midpoint dark blue (#00008B) to bottom left corner of cell 4 true blue (#0000FF) in dark mode, and the columns corresponding to the output Supported Player Range in Section 3 with diagonal colour gradient for every column, which consists of 4 cells, from top right corner of cell 1 true red (#FF0000) to midpoint light red (#FF7F7F) to bottom left corner of cell 4 true red (#FF0000) in light mode, from top left corner of cell 1 true red (#FF0000) to midpoint dark red (#8B0000) to bottom right corner of cell 4 true red (#FF0000) in dark mode. So, you have to calculate the colour gradients generating in 2 axes, from 2 directions, differing mixture of colours in 4 corners and in midpoint, in each mode, for the overlapping column. Mind the colours of the numbers in light and dark themes and make sure that they are clearly visible in both light and dark mode by modifying the colours of the numbers if necessary.
+
+Do not use dotted line for tooltips and toggletips.
+
+Use MathJax to display subscripts and superscripts in the functions popup notification so that the functions look like what we see in textbooks.
+
+Alignment:
+
+Title: top center
+
+All Subtitles except Note, Items, Footnote: center center
+
+Note: left
+
+Format:
+
+Subscripts:
+
+Rmin: R_{min}
+
+Rmax: R_{max}
+
+ERmin: E_{R_{min}}
+
+ERmax: E_{R_{max}}
+
+LmaxRmin: L_{max_{R_{min}}}
+
+LmaxRmax: L_{max_{R_{max}}}
+
+Lmax: L_{max}
+
+LmaxNmin: L_{max_{N_{min}}}
+
+LmaxNmax: L_{max_{N_{max}}}
+
+Ti: T_{i}
+
+Tp: T_{p}
+
+Tn: T_{n}
+
+Nmin: N_{min}
+
+Nmax: N_{max}
+
+Underline:
+
+'瑞士'
+
+'黃汶聰' (appearing twice in footer)
+
+Font(inline by base64):
+
+Onboarding screen, Title, Footnote, Legal menu title, Legal menu tab name, Legal menu tab content: 'Chiron Sung HK' ([https://raw.githubusercontent.com/Vviinncceenntt/swiss-round-calculator/main/chironsunghk-r.ttf](https://raw.githubusercontent.com/Vviinncceenntt/swiss-round-calculator/main/chironsunghk-r.ttf))
+
+Bottom navigation including text label, menu title(except Legal), tab name(except Legal) and tab content(except Legal and Wong system): 'Chiron Hei HK' ([https://raw.githubusercontent.com/Vviinncceenntt/fonts/main/chiron-hei-hk-2609/chironheihk-r.ttf](https://raw.githubusercontent.com/Vviinncceenntt/fonts/main/chiron-hei-hk-2609/chironheihk-r.ttf))
+
+Bottom navigation Wong system menu tab content: 'The Peak Font Plus' ([https://raw.githubusercontent.com/Vviinncceenntt/fonts/main/thepeakfontplus-v1-002/thepeakfontplus-regular.ttf](https://raw.githubusercontent.com/Vviinncceenntt/fonts/main/thepeakfontplus-v1-002/thepeakfontplus-regular.ttf))
+
+All unspecified texts: 'Chiron GoRound TC' ([https://raw.githubusercontent.com/Vviinncceenntt/fonts/main/chiron-go-round-tc-1011/chirongoroundtc-400r.ttf](https://raw.githubusercontent.com/Vviinncceenntt/fonts/main/chiron-go-round-tc-1011/chirongoroundtc-400r.ttf))
+
+Source Excel formula for your calculation:
+
+k=IF(IF(p&lt;1,1,ROUNDUP(p,0))&lt;3,0,ROUNDUP(LOG(IF(p&lt;1,1,ROUNDUP(p,0))*4/3,2),0)-1-1)
+
+c=IF(d&lt;2,2,ROUNDUP(d,0))-1
+
+Rmin=MIN(IF(MOD(IF(n&lt;4,4,ROUNDUP(n,0)),2)=1,IF(n&lt;4,4,ROUNDUP(n,0)),IF(n&lt;4,4,ROUNDUP(n,0))-1),ROUNDUP(LOG(IF(n&lt;4,4,ROUNDUP(n,0))*4/3,2),0)+k)
+
+Rmax=MIN(IF(MOD(IF(n&lt;4,4,ROUNDUP(n,0)),2)=1,IF(n&lt;4,4,ROUNDUP(n,0)),IF(n&lt;4,4,ROUNDUP(n,0))-1),ROUNDUP(LOG(IF(n&lt;4,4,ROUNDUP(n,0))*4/3,2),0)+(ROUNDUP(LOG(IF(n&lt;4,4,ROUNDUP(n,0))*4/3,2),0)-1-1),Rmin+c)
+
+ERmin=ROUNDUP(ROUNDDOWN(Rmin/2,0)/2,0)
+
+ERmax=ROUNDUP(ROUNDDOWN(Rmax/2,0)/2,0)
+
+LmaxRmin=IF(IF(n&lt;4,4,ROUNDUP(n,0))*4/3*BINOM.DIST(BINOM.INV(Rmin,0.5,IF(p&gt;IF(n&lt;4,4,ROUNDUP(n,0)),IF(n&lt;4,4,ROUNDUP(n,0)),IF(p&lt;1,1,ROUNDUP(p,0)))/(IF(n&lt;4,4,ROUNDUP(n,0))*4/3)),Rmin,0.5,TRUE)&lt;=IF(p&gt;IF(n&lt;4,4,ROUNDUP(n,0)),IF(n&lt;4,4,ROUNDUP(n,0)),IF(p&lt;1,1,ROUNDUP(p,0))),BINOM.INV(Rmin,0.5,IF(p&gt;IF(n&lt;4,4,ROUNDUP(n,0)),IF(n&lt;4,4,ROUNDUP(n,0)),IF(p&lt;1,1,ROUNDUP(p,0)))/(IF(n&lt;4,4,ROUNDUP(n,0))*4/3)),BINOM.INV(Rmin,0.5,IF(p&gt;IF(n&lt;4,4,ROUNDUP(n,0)),IF(n&lt;4,4,ROUNDUP(n,0)),IF(p&lt;1,1,ROUNDUP(p,0)))/(IF(n&lt;4,4,ROUNDUP(n,0))*4/3))-1)
+
+LmaxRmax=IF(IF(n&lt;4,4,ROUNDUP(n,0))*4/3*BINOM.DIST(BINOM.INV(Rmax,0.5,IF(p&gt;IF(n&lt;4,4,ROUNDUP(n,0)),IF(n&lt;4,4,ROUNDUP(n,0)),IF(p&lt;1,1,ROUNDUP(p,0)))/(IF(n&lt;4,4,ROUNDUP(n,0))*4/3)),Rmax,0.5,TRUE)&lt;=IF(p&gt;IF(n&lt;4,4,ROUNDUP(n,0)),IF(n&lt;4,4,ROUNDUP(n,0)),IF(p&lt;1,1,ROUNDUP(p,0))),BINOM.INV(Rmax,0.5,IF(p&gt;IF(n&lt;4,4,ROUNDUP(n,0)),IF(n&lt;4,4,ROUNDUP(n,0)),IF(p&lt;1,1,ROUNDUP(p,0)))/(IF(n&lt;4,4,ROUNDUP(n,0))*4/3)),BINOM.INV(Rmax,0.5,IF(p&gt;IF(n&lt;4,4,ROUNDUP(n,0)),IF(n&lt;4,4,ROUNDUP(n,0)),IF(p&lt;1,1,ROUNDUP(p,0)))/(IF(n&lt;4,4,ROUNDUP(n,0))*4/3))-1)
+
+Lmax=IF(IF(n&lt;4,4,ROUNDUP(n,0))*4/3*BINOM.DIST(BINOM.INV(IF(r&lt;3,3,ROUNDUP(r,0)),0.5,IF(p&gt;IF(n&lt;4,4,ROUNDUP(n,0)),IF(n&lt;4,4,ROUNDUP(n,0)),IF(p&lt;1,1,ROUNDUP(p,0)))/(IF(n&lt;4,4,ROUNDUP(n,0))*4/3)),IF(r&lt;3,3,ROUNDUP(r,0)),0.5,TRUE)&lt;=IF(p&gt;IF(n&lt;4,4,ROUNDUP(n,0)),IF(n&lt;4,4,ROUNDUP(n,0)),IF(p&lt;1,1,ROUNDUP(p,0))),BINOM.INV(IF(r&lt;3,3,ROUNDUP(r,0)),0.5,IF(p&gt;IF(n&lt;4,4,ROUNDUP(n,0)),IF(n&lt;4,4,ROUNDUP(n,0)),IF(p&lt;1,1,ROUNDUP(p,0)))/(IF(n&lt;4,4,ROUNDUP(n,0))*4/3)),BINOM.INV(IF(r&lt;3,3,ROUNDUP(r,0)),0.5,IF(p&gt;IF(n&lt;4,4,ROUNDUP(n,0)),IF(n&lt;4,4,ROUNDUP(n,0)),IF(p&lt;1,1,ROUNDUP(p,0)))/(IF(n&lt;4,4,ROUNDUP(n,0))*4/3))-1)
+
+LmaxNmin=IF(Nmin*4/3*BINOM.DIST(BINOM.INV(IF(r&lt;3,3,ROUNDUP(r,0)),0.5,IF(p&lt;1,1,ROUNDUP(p,0))/(Nmin*4/3)),IF(r&lt;3,3,ROUNDUP(r,0)),0.5,TRUE)&lt;=IF(p&lt;1,1,ROUNDUP(p,0)),BINOM.INV(IF(r&lt;3,3,ROUNDUP(r,0)),0.5,IF(p&lt;1,1,ROUNDUP(p,0))/(Nmin*4/3)),BINOM.INV(IF(r&lt;3,3,ROUNDUP(r,0)),0.5,IF(p&lt;1,1,ROUNDUP(p,0))/(Nmin*4/3))-1)
+
+LmaxNmax=IF(Nmax*4/3*BINOM.DIST(BINOM.INV(IF(r&lt;3,3,ROUNDUP(r,0)),0.5,IF(p&lt;1,1,ROUNDUP(p,0))/(Nmax*4/3)),IF(r&lt;3,3,ROUNDUP(r,0)),0.5,TRUE)&lt;=IF(p&lt;1,1,ROUNDUP(p,0)),BINOM.INV(IF(r&lt;3,3,ROUNDUP(r,0)),0.5,IF(p&lt;1,1,ROUNDUP(p,0))/(Nmax*4/3)),BINOM.INV(IF(r&lt;3,3,ROUNDUP(r,0)),0.5,IF(p&lt;1,1,ROUNDUP(p,0))/(Nmax*4/3))-1)
+
+Ti=IF(IF(i&lt;1,1,ROUNDUP(i,0))&lt;=3,IF(i&lt;1,1,ROUNDUP(i,0)),MAX(4,ROUNDUP(LOG(IF(i&lt;1,1,ROUNDUP(i,0))/3,2),0)+3))
+
+Tp=IF(IF(p&gt;IF(n&lt;4,4,ROUNDUP(n,0)),IF(n&lt;4,4,ROUNDUP(n,0)),IF(p&lt;1,1,ROUNDUP(p,0)))&lt;=3,IF(p&gt;IF(n&lt;4,4,ROUNDUP(n,0)),IF(n&lt;4,4,ROUNDUP(n,0)),IF(p&lt;1,1,ROUNDUP(p,0))),MAX(4,ROUNDUP(LOG(IF(p&gt;IF(n&lt;4,4,ROUNDUP(n,0)),IF(n&lt;4,4,ROUNDUP(n,0)),IF(p&lt;1,1,ROUNDUP(p,0)))/3,2),0)+3))
+
+Tn=ROUNDUP(LOG(IF(n&lt;4,4,ROUNDUP(n,0))/3,2),0)+3
+
+Nmin=MAX(4,IF(p&lt;1,1,ROUNDUP(p,0)),ROUNDDOWN(3/4*POWER(2,IF(r&lt;3,3,ROUNDUP(r,0))-k-c-1),0)+1)
+
+Nmax=MAX(4,IF(p&lt;1,1,ROUNDUP(p,0)),ROUNDDOWN(3/4*POWER(2,IF(r&lt;3,3,ROUNDUP(r,0))-k),0))
+
+where r stands for rounds, should be at least 3 and must be positive integer, p stands for accurate ranks to determine, should be at least 1 and at most equals to n and must be positive integer, d stands for score group distance of the opponents against whom the top p players not to play starting from the second last round, should be at least 2 and must be positive integer, n stands for total number of players, should be at least 4 and must be positive integer, k stands for extra rounds for the top p placements needed, c stands for extra rounds for the top p players not to play against opponents from d score groups away starting from the second last round, Rmin stands for minimum number of rounds required to accurately determine top p placements, Rmax stands for maximum number of rounds recommended that more rounds beyond the number are redundant, ERmin stands for suggested number of elimination rounds that go beyond the Swiss rounds for the respective minimum rounds, ERmax stands for suggested number of elimination rounds that go beyond the Swiss rounds for the respective maximum rounds, LmaxRmin stands for maximum number of losses that a player could tolerate to secure a placement in the top p for the respective minimum rounds and input n players, LmaxRmax stands for maximum number of losses that a player could tolerate to secure a placement in the top p for the respective maximum rounds and input n players, Lmax stands for maximum number of losses that a player could tolerate to secure a placement in the top p for the respective input n players and input r rounds, LmaxNmin stands for maximum number of losses that a player could tolerate to secure a placement in the top p for the respective minimum supported players and input r rounds, LmaxNmax stands for maximum number of losses that a player could tolerate to secure a placement in the top p for the respective maximum supported players and input r rounds, i stands for rank of player, Ti stands for tier to which the player at rank i belongs, Tp stands for tier to which the player at rank p belongs, Tn stands for tier to which the player at rank n belongs.
+
+Do not do your own translation when there is a given text.
+
+Use lipsum when the content of texts is not provided yet via reference link to document containing the text.
+
+Avoid input and output fields and buttons floating out of their parent container. In React Native, use the Keyboard Module to prevent the keyboard from covering the text input following the input in focus.
+
+Avoid the first letters of the notations with subscripts in the First Column of the table floating to the next line. Make sure the subscripts of the texts of the header column of the table in the dashboard are done properly.
+
+Make sure that tooltips and toggletips inside containers are not clipped, not covered by table title, First Column and that they are allowed to flip to avoid to be cut by edge of frame. Set appropriate z-indexes for tooltips and toggletips and their parent containers to ensure that the entire description is visible. The tooltip and toggletip descriptions of the First Column of the table should be above all cells of the First Column and other cells, not only the cells to which they belong and the cells of the previous rows, but also those of the upcoming rows. Yet, no tooltip and toggletip descriptions should mask the bottom navigation. Reclicking/retapping the same tooltip/toggletip, clicking/tapping other tooltips/toggletips, or clicking/tapping somewhere else should render the description disappear.
+
+Make sure that the closing buttons of all the popup notifications are visible on landscape view on mobile device.
+
+Make sure the Chinese text labels and menu titles and the English text labels and menu titles of the Bottom Navigation go line by line with Chinese on top of English.
+
+Create proper documentation and summarise all the changes to keep track of the changes as you generate the code.
+
+Try not to reference the fonts to Github but pack the fonts under assets/fonts/ as fallback. Inline ttf and svg if necessary for proper rendering.
+
+Review the full codebase. Generate a comprehensive architecture doc: folder structure, key components, data flows, upgrade hooks, and migration guide.
+
+Commit it as docs/[architecture-v1.md](http://architecture-v1.md) with git tag v1.0, together with [TODO.md](http://TODO.md), [CHANGELOG.md](http://CHANGELOG.md), [README.md](http://README.md), .gitignore, .env, .env.example.
+
+Prioritise React Native over web in light of limited calls to establish clearer directory structure. Prioritise task accuracy over project build time. Prioritise objective attainment over number of calls. Prioritise functionality over file size.

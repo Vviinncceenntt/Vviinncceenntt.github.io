@@ -1,0 +1,87 @@
+Four real issues. Let me address them all carefully.
+
+## Issue 1 — Legal icon fallback shows nothing
+
+The error boundary only catches **React render errors**, not silent SVG parse failures. `SvgXml` typically renders nothing on a malformed SVG without throwing. The safer fix is to **always** use `privacy-document-icon` on mobile, OR pre-validate `p-writing.svg`. Per user's preference (use `p-writing` if possible, `privacy-document` as fallback), let me probe whether `SvgXml` can actually render `p-writing.svg`. The cleanest practical approach: try a **trimmed** version of `p-writing` that strips the radial gradient defs `react-native-svg` chokes on; if even that fails, show `privacy-document-icon`.
+
+Actually, the simplest and most reliable approach: detect platform and use `pWriting` on web, `privacyDocumentIcon` on iOS/Android. That matches the user's intent ("use privacy-document as fallback when p-writing cannot work" → on mobile it cannot reliably work, so use the fallback).
+
+## Issue 2 — Subscripts misaligned: last sub vertically centred, first floating at top
+
+Let me check the current code:
+
+The bug: at `LmaxRmin = L_{max_{R_{min}}}`, the rendered flex children are `[L, max, R, min]` all as siblings of the same row, each with its own `marginTop`. The `max` gets `marginTop = 0.35*baseSize`, the `R` gets the same (depth 1), and `min` gets `marginTop = 0.6*baseSize` (depth 2). With `alignItems: 'flex-start'`, they all start from the top but with different push-downs — but the parent row's height is determined by the TALLEST child, which is `L` at full size. So short subs get `marginTop` from the top of the row → they end up LOWER but the visual baseline mismatch is jarring.
+
+The real subscript convention: `L_{max_{R_{min}}}` should render as:
+```
+L max  R  min      ← logical levels
+    (each subsequent is smaller and lower than its parent base)
+```
+
+But the LAYOUT problem is that the user perceives subs as "centred". That's because once we have `marginTop`, each level's child sits at its own y-offset, but `alignItems: flex-start` aligns each independently and the row height grows to the max of (size + marginTop). The short subs LOOK centred because the row is taller than they are.
+
+Better approach: render the WHOLE notation as a single inline `<Text>` with nested `<Text>` children, exploiting RN's actual support for **inline text nesting** plus `verticalAlign` (RN 0.74+) or simply smaller `fontSize` (which naturally aligns to baseline). Let me use that approach:
+
+## Issue 3 — "備註：" and "Note:" left-aligned
+
+The Section component centres titles. Add a `titleAlign` prop:
+
+Now pass `titleAlign="left"` to the Note section in DashboardScreen:
+
+Update web index.html — the Note section title needs left alignment too:
+
+## Issue 4 — English texts in leftmost table column more visible
+
+**Web:** the English text uses `color: var(--text-soft)` which on the buff/beige table background is too dim. Make it use the full `--table-text` colour. **Mobile:** same issue — `headEn` doesn't set a color but inherits `theme.tableText` from the inline style; but `fontSize: 10` is tiny.
+
+Now let me also verify the SubSym update parses cleanly:
+
+All 28 files parse cleanly. Now let me update all the markdown files (README, TODO, architecture-v1, CHANGELOG, FAVICON, scripts/README, both font READMEs):
+
+Now update README — keep mostly as-is but fix the version & status section:
+
+Update TODO — bump version reference:
+
+Update docs/architecture-v1.md:
+
+Also update the relevant architecture sections to mention the v1.0.17 details:
+
+Add a Section subsystems section for the SubSym rewrite:
+
+Update the Section component docs:
+
+Now FAVICON.md is fine (no behavioural changes needed). mobile/scripts/README.md mentions `pasted-image-…`. Let me check both:
+
+Just `mobile/scripts/README.md`. Let me check what it says:
+
+Wait — earlier `grep -l` found `p-writing` in `mobile/scripts/README.md` but a more specific grep finds nothing. Let me check:
+
+Only `inline-icons` (case-insensitive `i` matched). The doc is fine — it generically describes the icon pipeline. Let me add a one-paragraph note about the Legal icon's special handling:
+
+Sanity check, then commit:
+
+Commit:
+
+Tagged **v1.0.17**.
+
+## Summary
+
+| # | Issue | Fix |
+|---|-------|-----|
+| 1 | Legal icon blank on mobile | The error boundary couldn't catch `SvgXml`'s **silent** 0×0 render on `p-writing.svg` (no exception thrown, just empty output). `BottomNav.js` now uses `privacy-document-icon.svg` deterministically on mobile (matches your "fallback when p-writing cannot work" requirement). Web continues using `p-writing.svg`. |
+| 2 | Subscripts mis-aligned on mobile (centred subs, floating bases) | The flex-row + `marginTop` layout couldn't enforce a baseline. Rewrote `SubSym.js` to render the whole notation as **one outer `<Text>` with nested smaller `<Text>` children**. RN's inline text nesting aligns every glyph on the SAME baseline naturally, so smaller subs sit visually lower than the larger base. Matches the web `<sub>…</sub>` nesting one-to-one. |
+| 3 | "備註：" / "Note:" alignment | Added `titleAlign` prop on `<Section/>` (default `'center'`), passed `titleAlign="left"` for Section 5 on mobile. Added matching `.subtitle.note-title` CSS on web. Both builds now show the Note title left-aligned. |
+| 4 | English text invisible in matrix header column | Both builds: switched from `--text-soft` to full `--table-text` colour with `font-weight: 500`. Mobile fontSize bumped from 10 → 11 with `lineHeight: 13` for proper spacing. |
+| 5 | All `.md` files updated | `CHANGELOG`, `README`, `TODO`, `docs/architecture-v1.md`, `mobile/scripts/README.md` all reflect v1.0.17. `FAVICON.md` and the two `assets/fonts/README.md` files needed no changes. |
+
+```
+$ git tag
+v1.0 … v1.0.17
+```
+
+Pull v1.0.17, restart Expo (`npm run start`):
+
+- Legal icon shows the document with shield (privacy-document-icon).
+- Subscripts: `R₍min₎`, `E_{R_{min}}`, `L_{max_{R_{min}}}` align on a true baseline, matching the web build.
+- Note section title sits at the left of Section 5.
+- English headers in the matrix table (Rounds / Elimination Rounds / Maximum Losses / Player Range) are clearly readable on the buff background.

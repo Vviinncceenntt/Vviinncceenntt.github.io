@@ -1,0 +1,19 @@
+Opening the QR code by scanning with camera receives the same "There was a problem running the requested app. Unknown error: The request timed out. exp://192.168.0.127:8081"
+
+Confirmed IP remains the same with ipconfig.
+
+Downloaded /status from Safari to see it is 23bytes written "packager-status:running".
+
+
+
+Tried again using tunnel:
+
+ip the same
+
+status from second cmd is "**packager-status:running"**
+
+the QR generated in tunnel mode followed by exp://pxtev-c-anonymous-8081.exp.direct
+
+the error on iPhone after scanning shows: Unknown error: The request timed out. exp://pxtev-c-anonymous-8081.exp.direct
+
+PC did reboot, Wifi did on and off, iPhone did disconnect Wifi and reconnect wifi.

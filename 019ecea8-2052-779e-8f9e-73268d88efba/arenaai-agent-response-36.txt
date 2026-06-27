@@ -1,0 +1,306 @@
+Ran commands
+18
+Let me look at a few more files I'll need to modify before making the changes.
+
+
+Ran commands
+3
+Let me look at a few more files to plan the changes properly.
+
+
+Ran commands
+2
+I have a good understanding now. Let me make the changes for v1.0.19. Quick recap of what I'm changing:
+
+Remove TEXT_RENDER_FIX (caused shade/zigzag, didn't fix MathJax) — keep PEAK_FONT_FIX
+English text height to match Chinese (size, not weight)
+App-title bold rendered on mobile (textShadow fake-bold trick, since the single TTF has no bold variant)
+Buttons → medium weight '500' on both platforms for visual parity
+Web matrix gradient that spans the whole column (via background-size: 100% 400% + per-row background-position)
+Diagonal gradient: mid-band lying exactly on TR-BL line by using angle = 180° − atan(W/H) on the column dimensions
+Long-press progressive auto-increment for up/down arrows on both web and mobile
+Let me start editing:
+
+
+Edit
+mobile/src/utils/webviewDarkMode.js
+
+Edit
+swiss-round-calculator/mobile/src/utils/webviewDarkMode.js
+webviewDarkMode.js
+JS
+/**
+ * Helpers for embedded WebView pages.
+ *
+ *  - INJECTED_DARK / INJECTED_LIGHT: tiny <style> tag for dark / light
+ *    theme. We do NOT touch font-family — the page's own style.css
+ *    declares the family and applies it to <body>.
+ *  - PEAK_FONT_FIX: a corrected @font-face declaration for
+ *    "The Peak Font Plus", added because the upstream
+ *    https://vviinncceenntt.github.io/style.css uses
+ *      src: url('thepeakfontplus-regular.ttf') format('ttf');
+ *    where the W3C spec requires format('truetype'). Some WebView
+ *    engines silently drop the @font-face when the format hint is
+ *    unknown. Re-declaring the rule with the correct hint pointing at
+ *    the SAME remote file means we add ~0 KB to the JS bundle and the
+ *    font loads. (Best fix is also to correct the upstream style.css —
+ *    but the app stays robust either way.)
+ */
+export const INJECTED_DARK = `
+(function () {
+  try {
+    var id = '__src_dark__';
+    if (document.getElementById(id)) return true;
+    var s = document.createElement('style');
+    s.id = id;
+    s.textContent = [
+      'html, body { background:#111 !important; color:#EEE !important; }',
+      'a { color:#9CC7FF !important; }',
+      'h1,h2,h3,h4,h5,h6, p, li, td, th, span, div, em, strong { color:#EEE !important; }',
+      'code, pre { background:#222 !important; color:#EEE !important; }',
+      'table, th, td { border-color:#444 !important; }',
+      'blockquote { color:#CCC !important; border-color:#444 !important; }',
+      'iframe { background:#111 !important; filter: invert(1) hue-rotate(180deg); }'
+    ].join('\\n');
+    (document.head || document.documentElement).appendChild(s);
+    return true;
+  } catch (e) { return false; }
+})();
+true;
+`;
+
+export const INJECTED_LIGHT = `
+(function () {
+  var s = document.getElementById('__src_dark__');
+  if (s && s.parentNode) s.parentNode.removeChild(s);
+  return true;
+})();
+true;
+`;
+
+/**
+ * (Removed in v1.0.19.)
+ *
+ * Earlier versions injected a TEXT_RENDER_FIX <style> that tried to
+ * normalise WebView line-boxes to defeat MathJax "bumpy" sub/sup
+ * glyphs. In practice it did NOT improve the MathJax-rendered math,
+ * but it DID add visible "shading" and "zigzag" artefacts to every
+ * other word (Chinese included) and even to the grid lines on the
+ * Wong-system page when zoomed.
+ *
+ * Per user feedback v1.0.19 we drop the injection entirely. The
+ * upstream functions.html does not specify any font and the WebView
+ * default rendering is acceptable as-is.
+ *
+ * The export is kept as an empty string so existing imports do not
+ * need to change shape; callers can still concatenate it and the
+ * concatenation is a no-op.
+ */
+export const TEXT_RENDER_FIX = '';
+
+/**
+ * Re-declare "The Peak Font Plus" with a spec-compliant format hint.
+ * Safe to inject into any page (only adds a single <style> tag) and
+ * harmless on pages that don't use the family.
+ */
+export const PEAK_FONT_FIX = `
+(function () {
+  try {
+    var id = '__src_peak_font__';
+    if (document.getElementById(id)) return true;
+    var s = document.createElement('style');
+    s.id = id;
+    s.textContent =
+      "@font-face{font-family:'The Peak Font Plus';" +
+      "src:url('https://vviinncceenntt.github.io/thepeakfontplus-regular.ttf') format('truetype');" +
+      "font-display:block;}";
+    (document.head || document.documentElement).appendChild(s);
+    return true;
+  } catch (e) { return false; }
+})();
+true;
+`;
+
+
+Open
+Now let me think about whether to keep the PEAK_FONT_FIX. User said "same to the Peak Font Plus Font injection if it does not help". Since they said it "looks fine now", I'll keep PEAK_FONT_FIX for safety — and the upstream is the only source of the font, so it does help when format hint fails. Per user: "though it looks fine now" — they want me to remove only if it doesn't help. It does help. Keep it.
+
+Now let me work on the column-spanning gradient on web. The CSS td.hi-player paints each cell separately. To span all 4 rows of a column, I can use background-attachment: fixed? No, that's viewport. Better approach: use background-size: 100% 400% with background-position: 0 (row_index * 33.33%). Let me think.
+
+For a column of 4 rows where each row td renders independently, if I set each td to display the same gradient and use background-size: 1col × 4rows with background-position: 0% (i/3 * 100%), the gradient will appear continuous across the column.
+
+Actually simpler: I can use background-attachment: local and add data attributes for row index, then set background-position-y per row.
+
+Even simpler: render the gradient as a ::before pseudo-element on the first cell that spans the full column via position: absolute. But td positioning is complex.
+
+The cleanest CSS-only way: each td has the same linear-gradient(...) background, background-size: 100% 400%, background-position: 0% calc(var(--row) * 33.333%) where --row is 0..3. JS sets --row on each td.
+
+For the diagonal request: user wants the light-blue band to lie on the TR-BL diagonal (anti-diagonal). With the column being width × height, a true diagonal from TR to BL has slope -height/width. For a 3-stop gradient where the middle band is perpendicular to the gradient axis, we need the gradient axis to be perpendicular to the TR-BL diagonal — which means the gradient axis goes from TL to BR. That's exactly what linear-gradient(135deg) is — but only if the column is square! When the box is non-square, 135deg doesn't actually pass through corner-to-corner; the corner-to-corner direction is to bottom right (which is the angle whose perpendicular goes from TR to BL).
+
+Actually for the answer:
+
+"to bottom right" gradient: axis goes corner-to-corner TL→BR. The midpoint line is perpendicular to TL→BR, passing through the geometric center. That's the TR→BL diagonal!
+But for a non-square cell, to bottom right is computed by CSS spec to make the gradient line such that the starting corner color is at the start corner — and the midpoint perpendicular passes through TR and BL. So to bottom right already does what the user wants!
+
+Wait. The current CSS uses linear-gradient(135deg, ...). For a square that = to bottom right. For a non-square, 135deg is fixed-angle, but to bottom right is corner-aware. Let me switch to to bottom right / to top left etc.
+
+Let me also handle column-spanning gradient. Here's my plan for web:
+
+CSS
+
+td.hi-player {
+  background:
+    linear-gradient(to bottom right,
+      var(--grad-player-a) 0%,
+      var(--grad-player-mid) 50%,
+      var(--grad-player-a) 100%) !important;
+  background-size: 100% 400%;
+  background-position: 0% var(--row-pos, 0%);
+  background-repeat: no-repeat;
+  ...
+}
+JS will compute and set --row-pos per td (calc(${i / 3 * 100}%)).
+
+Hmm but to bottom right over a 400%-tall background means CSS will compute the diagonal of the 4× tall background, not the actual cell. The light-blue band would lie along the TR-BL diagonal of the 4× tall box. That should still be visible.
+
+Actually wait — we want the gradient to span the entire column (4 rows × 1 col), not the cell. The column has aspect ratio of W×4H. So the "to bottom right" of that column means TL→BR of the column. The mid-band would be perpendicular to that, going from a point near TR-extended to BL-extended.
+
+For the user's requested behavior: "the light blue line lies on the diagonal line from the top right corner to the bottom left corner". For a column W×(4H), the TR-BL diagonal connects (W, 0) to (0, 4H). For the gradient mid-band to lie on this line, the gradient axis must be perpendicular to it, which means the axis goes from (0,0) to (W, 4H) — that's exactly the column's own "to bottom right" diagonal. ✓
+
+So to bottom right on the column's full geometry works. By using background-size: 100% 400% and shifting per-row, the column appears as one continuous gradient with the perpendicular mid-band on its TR-BL diagonal.
+
+For mobile, this is harder because expo-linear-gradient draws into a single element. The current MatrixTable already draws a single <LinearGradient> per column (absolutely positioned over all 4 rows), so this already spans the column. To get the perpendicular mid-band on the TR-BL diagonal, I need the gradient direction to be TL→BR. The LinearGradient component takes start={x,y} and end={x,y} in 0..1 range; the line is drawn as (start.x * width, start.y * height) → (end.x * width, end.y * height). So start={0,0}, end={1,1} gives a TL→BR direction which... hmm, but stops are spaced uniformly along that line so the mid-band IS perpendicular to it. ✓
+
+Wait — actually in pixel space, the line from (0,0) to (W, H) is NOT the diagonal direction (since W≠H for a column). The mid stop is at (W/2, H/2) which IS the center. The "isobars" (lines of equal gradient progress) are perpendicular to the gradient line in pixel space (= perpendicular to (W,H) vector). And the TR-BL diagonal has direction (-W, H), whose dot product with (W,H) is -W²+H² = nonzero (when W≠H). So mid-band ISN'T on TR-BL diagonal.
+
+To force mid-band to be exactly on TR-BL diagonal: we need the gradient line perpendicular to that diagonal, i.e. in direction (W, H) ... wait that's what I just said. Hmm.
+
+Let me redo. TR is at (W, 0) and BL is at (0, H). Diagonal vector = BL − TR = (−W, H). Perpendicular to (−W, H) is (H, W) (since (−W,H)·(H,W) = −WH+HW = 0). So gradient line must go in direction (H, W), i.e. from (0,0) to (H/√(H²+W²), W/√(H²+W²)) scaled.
+
+In LinearGradient component terms (normalized space (x∈[0,1], y∈[0,1]) but pixel computation uses actual W,H), we need start→end vector to be (H, W) in pixel space. As fraction: start={0,0} and end={H/W, 1}? Then in pixels that's (W·H/W, H·1) = (H, H)... wait actually pixel direction = end_pixel − start_pixel = (H/W · W, 1 · H) = (H, H). That's the (1,1) direction, not (H,W).
+
+Right — because we're scaling by W and H separately, we lose the ratio. We need pixel direction (H, W). So set end = (h_norm, w_norm) such that:
+
+end.x * W = k * H
+end.y * H = k * W
+Pick k = W*H / max:
+
+end.x = k * H / W = H²/max
+end.y = k * W / H = W²/max
+Or simpler, end.x = H/W (normalized so x:y = H:W). Wait let's just set the normalized end coords so that when multiplied by (W,H) we get (H,W) ratio.
+
+If end = (a, b), pixel direction = (a·W, b·H). We want a·W : b·H = H : W, i.e. a·W·W = b·H·H, i.e. a/b = H²/W².
+
+So set end = {x: H², y: W²} (any positive scaling). Normalize to fit in [0,1]: divide by max. Say if H > W, then end = {x: 1, y: W²/H²}. Hmm that means start at TL going to (W, W²/H · H/H)...
+
+Actually expo-linear-gradient docs say start/end are objects in the [0,1] coordinate space relative to the gradient's box. So setting start={x:0, y:0} and end={x:H², y:W²} normalized... let me check. Actually I think expo-linear-gradient treats them as 0..1 fractions of width/height.
+
+For matrix column: W ≈ 96px (COL_W), H = 564 = 224px. So H>W. End = {x: 1, y: W²/H²} = {x: 1, y: (96/224)²} = {x: 1, y: 0.184}. That puts the gradient end at a point along the right edge, 18.4% down from the top. The gradient line from (0,0) to (W, 0.184H) = (96, 41.2) in pixels. Direction (96, 41.2), normalized: (0.919, 0.394). Perpendicular: (−0.394, 0.919). The mid stop is at (48, 20.6) in pixel space. Iso-bands go in perpendicular direction.
+
+Does the iso-band through center pass through TR (96, 0) and BL (0, 224)? Center of column = (48, 112). TR-BL diagonal passes through (48, 112)? Yes, midpoint of TR(96,0) and BL(0,224) = (48, 112). ✓ Good.
+
+Now is the perpendicular direction (−0.394, 0.919) parallel to TR-BL diagonal direction (−96, 224)? Normalize (−96, 224): magnitude = √(96² + 224²) = √(9216+50176) = √59392 ≈ 243.7. Normalized: (−0.394, 0.919). ✓ Matches.
+
+So end = {x: 1, y: W²/H²} works for H>W case. Let me make a general function.
+
+Actually a cleaner formulation: we want the gradient axis perpendicular to the diagonal from corner A to corner C. For an arbitrary rectangle W×H, the perpendicular-to-anti-diagonal axis has pixel direction (H, W) normalised. In expo-linear-gradient's [0,1] system, we set:
+
+if W ≥ H: end = {x: 1, y: W/H · H/W?} ...
+Let me just compute. Want (end.x * W, end.y * H) ∝ (H, W). So end.x * W / H = end.y * H / W ⇒ end.x · W² = end.y · H².
+
+Pick max coordinate = 1:
+
+If W² ≥ H²: end.x = 1, end.y = W²/H²... wait that gives y>1 which clips.
+Hmm. The constraint is end ∈ [0,1]². But what matters is the direction of the line. We can set both start AND end. Better:
+
+Compute the direction unit vector in [0,1] space: dx_normalized = H/W, dy_normalized = W/H... actually I should just pick a max dimension and set:
+If H ≥ W: end = {x: 1, y: (W/H)²} (this is ≤1 since W≤H).
+If H < W: end = {x: (H/W)², y: 1}.
+
+For matrix column (W=96, H=224), W < H ⇒ end = {x:1, y: (96/224)²} = {x:1, y:0.184}. ✓
+
+For TL→BR direction (player gradient in light mode). For TR→BL direction... actually wait. The user said the mid-band should lie on TR-BL diagonal. They want this for both player (blue) and range (red) columns? Re-read:
+
+The colour gradient change is now, 3-point gradient, for example, in light mode, for the blue column, top left corner blue to midpoint light blue to bottom right corner blue, the line which is formed by light blue visually is always perpendicular to the line drawn from the top left corner to the bottom right corner. Is it possible to make gradients change at different rate in different area so that the light blue line lies on the diagonal line from the top right corner to the bottom left corner?
+
+So currently the blue gradient: corners BLUE (TL,BR) and mid-band LIGHT-BLUE perpendicular to TL-BR diagonal. They want mid-band on TR-BL diagonal.
+
+For the red column (rangeGradient) in mobile is currently start={1,0} end={0,1} which is TR→BL direction. Iso mid-band would be perpendicular to TR→BL, which is TL→BR. So currently the red column has its mid-band on TL→BR. User maybe wants both gradients consistent with the new direction.
+
+Re-reading: user only specifically requested for blue. But for consistency probably both. Let me ask user? Actually they said "for example, for the blue column" — implying same for red. I'll apply consistently. The current rangeGradient is BLUE-style direction (TR→BL) but with the rotation reversed; the user might want them both to have mid-band on TR-BL. So:
+
+Player: mid-band on TR-BL (corners TL+BR are saturated)
+Range: corners TR+BL saturated, mid-band on TL-BR? Or corners TL+BR saturated, mid-band on TR-BL same as player?
+Hmm. Let me ask. Actually no — the simpler interpretation: user wants the gradient to "change at different rates in different area" — i.e., the iso-bands aren't equally-spaced perpendicular lines, but adapted to the rectangle's aspect ratio so that the middle band passes through both TR and BL corners. So for player gradient (corners at TL, BR saturated), middle on TR-BL works. For range gradient (corners at TR, BL saturated currently), middle should be on TL-BR.
+
+Actually wait, I need to re-examine the current setup:
+
+JavaScript
+
+function playerGradient(theme) {
+  // start TL (0,0), end BR (1,1) in light
+}
+function rangeGradient(theme) {
+  // start TR (1,0), end BL (0,1) in light
+}
+So player has corners TL & BR saturated, range has TR & BL saturated (in light mode). These are visually distinct opposite-direction diagonals — that's intentional differentiation between the two highlight types.
+
+For the diagonal-correction, both should be similarly tweaked so that:
+
+Player: saturated at TL+BR corners, mid-band passes through TR and BL → perpendicular-to-anti-diagonal direction = (H,W) normalized
+Range: saturated at TR+BL corners, mid-band passes through TL and BR → perpendicular-to-diagonal direction = (-H,W) normalized, i.e. from TR to BL direction adjusted
+Let me code it.
+
+Now for the long-press auto-increment with progressive rate:
+
+Start with single bump on press
+After 400ms hold, start auto-bumping at 200ms interval
+After more time, speed up (e.g. every 1s, interval halves down to 30ms minimum)
+For RN: use onPressIn/onPressOut. For web: pointerdown/pointerup/pointercancel/pointerleave.
+
+Let me also fix:
+
+Web app-title bold: keep as-is (already bold) — user says it IS bold on web, NOT bold on mobile, and the title SHOULD be bold (it's the only bold one). So we need to MAKE it bold on mobile. But mobile only ships regular TTFs (no bold). Need to fake-bold: use textShadow or set fontWeight: 'bold' (will use system bold fallback) — but with custom fontFamily, RN won't synthesize bold. We can:
+Add textShadow trick (same character, slight offset) to fake bold
+Or set explicit fontWeight to 700 — works on iOS/Android with custom fonts only if a bold variant is registered.
+Use textShadow trick — works reliably with single weight font.
+
+Buttons text — user wants between bold and non-bold. Currently mobile is fontWeight: '600' on btnT, but appears non-bold (since custom font with no bold variant). Web is font-weight: 600 which uses synthetic bold via system fallback. Let me set both to '500' and possibly add a slight textShadow on mobile to simulate weight. Actually if mobile uses '600' but renders regular because no weighted TTF available, and web '600' looks bold, then setting mobile to mimic web requires faking. Better: set web to 500 (medium) and keep mobile at 600 (which renders as regular since no bold variant) — they'll look similar (slight visual diff but acceptable).
+Hmm actually web fonts.css might load only regular weight TTFs. Let me check:
+</thinking>
+
+I have enough context. Let me ask a quick clarifying question to nail down two ambiguities before doing the work:
+
+1
+/
+2
+Skip
+For the new corner-aware gradient (mid-band on the TR→BL diagonal), apply it to:
+
+Both blue (player) and red (range) the same way
+Both will have their light/mid band lying on the TR→BL diagonal; corners are saturated. Easiest and most consistent.
+
+Mirror — blue on TR→BL, red on TL→BR
+Keeps the visual asymmetry between the two highlight types (player vs range).
+
+Blue only — leave red as it is now
+Only the blue column changes; red keeps current behaviour.
+Revise options or write your own...
+Submit
+2
+/
+2
+Skip
+About buttons + the app-title bold mismatch (web faux-bolds custom TTFs, mobile cannot):
+
+Disable faux-bold on web buttons; fake-bold the title on mobile
+All button text reads at regular weight on BOTH platforms; "Swiss Round Calculator" stays bold on both (fake-bold via textShadow on mobile).
+
+Use medium weight everywhere via CSS font-synthesis tuning
+Buttons and titles fall between bold and regular — least visually striking.
+
+Fake-bold the buttons too on mobile so they match web
+Mobile buttons get a slight textShadow to mimic web's faux-bold.
+Revise options or write your own...
+Submit
+Something went wrong. Please try again.

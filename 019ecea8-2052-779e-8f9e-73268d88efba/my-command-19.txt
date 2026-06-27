@@ -1,0 +1,45 @@
+I ran npx expo start --lan --clear in Git Bash, visited [http://localhost:8081/](http://localhost:8081/) on Chrome, waited 60 seconds to see C. Error in Metro window (red text in Git Bash):
+
+Web Bundling failed 2569ms node_modules\expo\AppEntry.js (3 modules)
+
+Unable to resolve "react-native-web/dist/exports/AppRegistry" from "node_modules\expo\src\launch\registerRootComponent.tsx"
+
+&gt; 1 | import '../Expo.fx';
+
+  2 |
+
+  3 | import { type ComponentType } from 'react';
+
+  4 | import { AppRegistry, Platform } from 'react-native';
+
+Import stack:
+
+ node_modules\expo\src\launch\registerRootComponent.tsx
+
+ | import "react-native-web/dist/exports/AppRegistry"
+
+ node_modules\expo\AppEntry.js
+
+ | import "expo/src/launch/registerRootComponent"
+
+ | import "./node_modules/expo/AppEntry"
+
+I ran npx expo start --web in a second Git Bash window. It said that port 8081 is being used by another process and asked if I use port 8082. I replied yes. Then, an error message appeared:
+
+CommandError: It looks like you're trying to use web support but don't have the required
+
+dependencies installed.
+
+Install react-native-web@^0.21.0 by running:
+
+npx expo install react-native-web
+
+If you're not using web, please ensure you remove the "web" string from the
+
+platforms array in the project Expo config.
+
+I typed npx expo login in this second Git Bash window and entered correct username, email, and password just to receive another message:
+
+ApiV2Error: Your username, email, or password was incorrect.
+
+Assertion failed: !(handle-&gt;flags &amp; UV_HANDLE_CLOSING), file src\win\async.c, line 76

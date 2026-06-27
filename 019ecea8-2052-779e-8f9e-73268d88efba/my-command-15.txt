@@ -1,0 +1,11 @@
+Development servers with no lists is the only section on the home tab on Expo Go;
+
+Running chcp 65001 before starting still generate malformed QR code;
+
+Windows Terminal pops up error message saying running npx codes is forbidden due to security issues;
+
+There is no such banner to open from clipboard on Expo Go;
+
+Long-pressing Expo Go app icon on home screen happens nothing;
+
+Git Bash can generate in-form QR code, I typed exp://192.168.0.127:8081 in Safari and had it opened by Expo Go via directly tapping Go on Safari. However, Expo Go gave me the same error message as the first time when I scanned the QR code, saying the request timed out.

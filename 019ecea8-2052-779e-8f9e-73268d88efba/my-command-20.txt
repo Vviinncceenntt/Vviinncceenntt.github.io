@@ -1,0 +1,57 @@
+I run python -m http.server 8000 in Git Bash window under swiss-round-calculator/web and I receive the following error:
+
+Traceback (most recent call last):
+
+  File "&lt;frozen runpy&gt;", line 198, in *run*module_as_main
+
+  File "&lt;frozen runpy&gt;", line 88, in *run*code
+
+  File "C:\Users\vviiv\AppData\Local\Programs\Python\Python314\Lib\http\[server.py](http://server.py)", line 1432, in &lt;module&gt;
+
+    test(
+
+    ~~~~^
+
+        HandlerClass=handler_class,
+
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    ...&lt;6 lines&gt;...
+
+        tls_password=tls_key_password,
+
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    )
+
+    ^
+
+  File "C:\Users\vviiv\AppData\Local\Programs\Python\Python314\Lib\http\[server.py](http://server.py)", line 1348, in test
+
+    server = ServerClass(addr, HandlerClass)
+
+  File "C:\Users\vviiv\AppData\Local\Programs\Python\Python314\Lib\[socketserver.py](http://socketserver.py)", line 457, in **init**
+
+    self.server_bind()
+
+    ~~~~~~~~~~~~~~~~^^
+
+  File "C:\Users\vviiv\AppData\Local\Programs\Python\Python314\Lib\http\[server.py](http://server.py)", line 1419, in server_bind
+
+    return super().server_bind()
+
+           ~~~~~~~~~~~~~~~~~~~^^
+
+  File "C:\Users\vviiv\AppData\Local\Programs\Python\Python314\Lib\http\[server.py](http://server.py)", line 148, in server_bind
+
+    socketserver.TCPServer.server_bind(self)
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+
+  File "C:\Users\vviiv\AppData\Local\Programs\Python\Python314\Lib\[socketserver.py](http://socketserver.py)", line 478, in server_bind
+
+    self.socket.bind(self.server_address)
+
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+
+PermissionError: [WinError 10013] 嘗試存取通訊端被拒絕，因為存取權限不足。

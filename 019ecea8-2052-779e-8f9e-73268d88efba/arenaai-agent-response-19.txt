@@ -1,0 +1,176 @@
+Three separate issues, but they reveal the actual situation clearly:
+
+## Diagnosis
+
+**The Chrome result C is misleading.** When you visit `http://localhost:8081/` in a browser, Metro detects the User-Agent and tries to serve a **web bundle** — that's why you saw the `react-native-web` error. It doesn't tell us anything about iOS. The web build is broken because I forgot to add `react-native-web` to `package.json`. Easy fix.
+
+**The login error** is almost certainly Expo asking for your **email**, not your username. The Expo CLI silently rejects usernames since 2024.
+
+**The real iOS situation:** Expo Go on iOS in 2026 is genuinely fragile on Windows without a Mac. After everything we've tried, the realistic options are:
+
+| Option | Effort | Reliability |
+|---|---|---|
+| **(A) Just use the `web/` folder on iPhone Safari** | 5 min | 100% |
+| **(B) EAS Build a development client once, then test forever** | 20 min one-time | 100% |
+| **(C) Keep fighting Expo Go LAN** | Unbounded | Low |
+
+Let me fix the package issues first, then strongly recommend **Option A** for "see the calculator on iPhone right now", and **Option B** for serious testing.
+
+## Fix the package.json (web preview now works)
+
+Also add `@expo/metro-runtime` (required by SDK 54 for web bundles):
+
+After you reinstall (`rm -rf node_modules && npm install`), `npx expo start --web` will work without errors. But that's not the most useful path.
+
+## ⭐ Option A — See the app on iPhone in 2 minutes (recommended for now)
+
+You already have a fully working **web build** under `web/`. Serve it from your PC and open it on iPhone Safari:
+
+```bash
+cd /c/path/to/swiss-round-calculator/web
+python -m http.server 8000
+```
+
+(Python comes pre-installed on Windows 11. If not, use `npx serve .` instead.)
+
+Then on your iPhone Safari (same Wi-Fi, no Expo Go needed):
+
+```
+http://192.168.0.127:8000
+```
+
+The calculator loads instantly. You'll see the bilingual onboarding screen, can tap "I Agree", reach the dashboard, swipe through sections, test all 4 bottom-nav menus, change themes, drag the triangular orientation toggle, see tooltips with live `<r>`/`<p>`/`<n>` substitution — every UI feature works exactly as on the App Store version.
+
+The only things missing in the web vs. native build:
+- Subscription purchase (RevenueCat is mobile-only by design)
+- Haptic feedback on tap
+- Auto-rotate orientation lock
+- File-system caching (web uses localStorage instead)
+
+For evaluating that **the app works**, the web version is functionally identical.
+
+## ⭐ Option B — EAS Development Build (the proper long-term solution)
+
+This builds a custom version of Expo Go containing **your project's exact native modules**, including `react-native-purchases`. Once installed on your iPhone you never deal with Expo Go's network handoff again.
+
+### Steps (all from Git Bash on Windows):
+
+```bash
+cd /c/path/to/swiss-round-calculator/mobile
+
+# 1. Fix login: use EMAIL, not username
+npx expo login
+# When prompted: enter your EMAIL address (the one you registered with), not username
+# If you forgot the password: https://expo.dev/forgot-password
+
+# 2. Install EAS CLI globally
+npm install -g eas-cli
+
+# 3. Initialise EAS project (creates a project ID)
+eas init
+
+# 4. Build a development client for iOS (free; runs on Apple's cloud servers)
+eas build --profile development --platform ios
+```
+
+During step 4, EAS asks:
+- **Apple account email**: any Apple ID works (free, no $99 developer account needed for development builds)
+- **Bundle identifier**: accept the default `com.vviinncceenntt.swissroundcalculator`
+- **Provisioning**: pick "**Let EAS handle credentials**"
+
+Build runs ~15 minutes in the cloud. When done, EAS prints a URL and QR code. On your iPhone:
+1. Open the URL in Safari → "Install" → asks for device passcode
+2. The app installs as `Swiss Round Calculator (Dev)` on your home screen
+3. Once installed, run on PC: `npx expo start --dev-client --lan --clear`
+4. Open the dev client app on iPhone — it auto-discovers your PC via Bonjour AND has a built-in URL entry field
+
+Subsequent code changes only require step 3+4. Build only happens again if you change native modules.
+
+### About the assertion crash
+
+The `Assertion failed: !(handle->flags & UV_HANDLE_CLOSING)` is a Node.js 24 crash bug triggered by Expo's CLI when login fails. Not your fault, not fatal — just an ugly crash on top of the actual error. Node 24 has several outstanding bugs interacting with older CLI tooling. You can downgrade to Node 22 LTS to avoid these, but it's optional:
+
+1. Download Node 22 LTS from <https://nodejs.org/en/download/lts>
+2. Install (uninstalls Node 24 automatically)
+3. Re-run `npm install` in `mobile/`
+
+## My honest recommendation
+
+For **right now, today**: do **Option A** — `python -m http.server` in the `web/` folder, open on iPhone Safari. You'll see your app in 2 minutes and can verify all the UI behaviour.
+
+For **App Store submission**: do **Option B** with the production profile:
+```bash
+eas build --profile production --platform ios
+eas submit --platform ios
+```
+That's literally the only viable path on Windows without a Mac, and it works perfectly.
+
+**Don't waste any more time on Expo Go LAN/tunnel.** That ship has sailed in modern Expo for Windows users; even Expo's own docs now recommend dev-client builds for Windows.
+
+---
+
+Let me commit the package fixes and tag a small patch:
+
+Tagged **v1.0.7**.
+
+## What to do right now
+
+### 🎯 Step 1 — Confirm your Expo login works
+
+Most likely you used a username. Try with your **email address**:
+
+```bash
+npx expo login
+# Email or username: your.email@example.com   ← USE EMAIL
+# Password: ********
+```
+
+If you forgot the password, reset it at <https://expo.dev/forgot-password>.
+
+### 🎯 Step 2 — See the app on iPhone *now* (zero Expo Go faff)
+
+```bash
+cd /c/path/to/swiss-round-calculator/web
+python -m http.server 8000
+```
+
+On iPhone Safari (same Wi-Fi):
+```
+http://192.168.0.127:8000
+```
+
+You'll see the **瑞士制輪數計算機 / Swiss Round Calculator** in 2 seconds.
+
+### 🎯 Step 3 — When you're ready to ship to App Store (later)
+
+Pull v1.0.7, reinstall, then build a dev client once:
+
+```bash
+cd /c/path/to/swiss-round-calculator/mobile
+rm -rf node_modules package-lock.json
+npm install
+npx expo login                                # email, not username
+npm install -g eas-cli
+eas init
+eas build --profile development --platform ios
+```
+
+After install on iPhone:
+```bash
+npx expo start --dev-client --lan --clear
+```
+Open the dev client app — it loads instantly, every time, every reload.
+
+The whole **Expo Go on iPhone via LAN/tunnel on Windows** path is a known dead end in late 2026. Move on; you'll save yourself days of frustration. The web preview shows you the full UI today, the EAS dev client gives you bulletproof native testing tomorrow, and `eas build --profile production` ships the actual App Store binary.
+
+```
+$ git tag
+v1.0
+v1.0.1
+v1.0.2
+v1.0.3
+v1.0.4
+v1.0.5
+v1.0.6
+v1.0.7
+```

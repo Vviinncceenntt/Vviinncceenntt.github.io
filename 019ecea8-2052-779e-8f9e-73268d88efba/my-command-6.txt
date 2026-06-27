@@ -1,0 +1,5 @@
+I prefer a triangular 3-state circular toggle switch slider to 3-dot button.
+
+The contents of the Functions, Legal, Wong system menus are even harder to read in dark mode now, having a light gray mask rather than a dark gray mask, after reversing black and white. Could the problem lie with the mask, the cover on iframe?
+
+The icons specified with linked svg on Github to the 4 Destinations in Bottom navigation are missing. Instead, dummy icons were used.
