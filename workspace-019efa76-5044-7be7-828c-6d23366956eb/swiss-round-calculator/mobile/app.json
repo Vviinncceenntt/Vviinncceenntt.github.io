@@ -1,0 +1,88 @@
+{
+  "expo": {
+    "name": "Swiss Round Calculator",
+    "slug": "swiss-round-calculator",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./assets/images/app-icon-1024.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/splash-portrait-light.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FAFAFA",
+      "dark": {
+        "image": "./assets/images/splash-portrait-dark.png",
+        "backgroundColor": "#0E0E10"
+      }
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.vviinncceenntt.swissroundcalculator",
+      "infoPlist": {
+        "UISupportedInterfaceOrientations": [
+          "UIInterfaceOrientationPortrait",
+          "UIInterfaceOrientationLandscapeLeft"
+        ],
+        "UISupportedInterfaceOrientations~ipad": [
+          "UIInterfaceOrientationPortrait",
+          "UIInterfaceOrientationLandscapeLeft"
+        ],
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "splash": {
+        "image": "./assets/images/splash-portrait-light.png",
+        "tabletImage": "./assets/images/splash-landscape-light.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#FAFAFA",
+        "dark": {
+          "image": "./assets/images/splash-portrait-dark.png",
+          "tabletImage": "./assets/images/splash-landscape-dark.png",
+          "backgroundColor": "#0E0E10"
+        }
+      }
+    },
+    "android": {
+      "package": "com.vviinncceenntt.swissroundcalculator",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/app-icon-1024.png",
+        "backgroundColor": "#FAFAFA"
+      },
+      "permissions": ["com.android.vending.BILLING"],
+      "splash": {
+        "image": "./assets/images/splash-android12-light.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#FAFAFA",
+        "dark": {
+          "image": "./assets/images/splash-android12-dark.png",
+          "backgroundColor": "#0E0E10"
+        }
+      }
+    },
+    "plugins": [
+      ["expo-screen-orientation", { "initialOrientation": "LANDSCAPE_LEFT" }],
+      "expo-font"
+    ],
+    "extra": {
+      "revenueCatIosKey": "appl_REPLACE_ME",
+      "revenueCatAndroidKey": "goog_REPLACE_ME",
+      "revenueCatEntitlement": "swiss_round_calculator_pro",
+      "revenueCatOffering": "default",
+      "basePrice": 30,
+      "baseCurrency": "HKD",
+      "eas": {
+        "projectId": "00000000-0000-0000-0000-000000000000"
+      }
+    },
+    "_masterAssets": {
+      "appIconSvg": "https://vviinncceenntt.github.io/swiss-round-calculator/appiconmastersvg.svg",
+      "splashLandscapeLightSvg": "https://vviinncceenntt.github.io/swiss-round-calculator/splashscreenlandscapelightmastersvg.svg",
+      "splashLandscapeDarkSvg": "https://vviinncceenntt.github.io/swiss-round-calculator/splashscreenlandscapedarkmastersvg.svg",
+      "splashPortraitLightSvg": "https://vviinncceenntt.github.io/swiss-round-calculator/splashscreenportraitlightmastersvg.svg",
+      "splashPortraitDarkSvg": "https://vviinncceenntt.github.io/swiss-round-calculator/splashscreenportraitdarkmastersvg.svg",
+      "splashAndroid12LightSvg": "https://vviinncceenntt.github.io/swiss-round-calculator/splashscreenandroid12lightmastersvg.svg",
+      "splashAndroid12DarkSvg": "https://vviinncceenntt.github.io/swiss-round-calculator/splashscreenandroid12darkmastersvg.svg",
+      "pipeline": "SVG -> vector PDF (sRGB) -> 32-bit PNG via scripts/generate-assets.sh"
+    }
+  }
+}

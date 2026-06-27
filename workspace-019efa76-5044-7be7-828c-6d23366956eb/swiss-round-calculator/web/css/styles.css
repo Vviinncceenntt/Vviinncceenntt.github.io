@@ -1,0 +1,537 @@
+/* ===== Theme variables ===== */
+:root {
+  --bg: #FAFAFA;
+  --card: #FFFFFF;
+  --text: #111111;
+  --text-soft: #444444;        /* used only for the offline timestamp + footnote */
+  --border: #BBBBBB;
+  --input-bg: #FFFFFF;
+  --input-text: #111111;
+  --primary: #0050B3;
+  --primary-text: #FFFFFF;
+  --table-bg: #F5F5DC;
+  --table-text: #111111;
+  --tooltip-bg: #222;
+  --tooltip-text: #FFF;
+  --warn: #B85C00;
+  --shadow: rgba(0,0,0,.15);
+  --nav-bg: #FFFFFF;
+  /* gradient anchor colours */
+  --grad-player-a: #0000FF;
+  --grad-player-mid: #ADD8E6;
+  --grad-player-num: #FFFFFF;   /* light mode: white numbers in highlight cells */
+  --grad-range-a: #FF0000;
+  --grad-range-mid: #FF7F7F;
+  --grad-range-num: #FFFFFF;
+  --switch-track-off: #BBBBBB;
+  --switch-track-on: #0050B3;
+  --switch-knob: #FFFFFF;
+}
+[data-theme="dark"] {
+  --bg: #0E0E10;
+  --card: #1A1A1D;
+  --text: #F2F2F2;
+  --text-soft: #DDDDDD;         /* brighter so secondary text stays legible */
+  --border: #444;
+  --input-bg: #222226;
+  --input-text: #F2F2F2;
+  --primary: #5BA3FF;
+  --primary-text: #0B0B0B;
+  --table-bg: #F0DC82;
+  --table-text: #111111;
+  --tooltip-bg: #F2F2F2;
+  --tooltip-text: #111;
+  --warn: #FFB066;
+  --shadow: rgba(0,0,0,.5);
+  --nav-bg: #161618;
+  --grad-player-mid: #00008B;
+  --grad-player-num: #F5F5DC;   /* dark mode: beige numbers per spec */
+  --grad-range-mid: #8B0000;
+  --grad-range-num: #F5F5DC;
+  --switch-track-off: #555;
+  --switch-track-on: #5BA3FF;
+  --switch-knob: #FFFFFF;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bg: #0E0E10; --card: #1A1A1D; --text: #F2F2F2; --text-soft: #DDDDDD;
+    --border: #444; --input-bg: #222226; --input-text: #F2F2F2;
+    --primary: #5BA3FF; --primary-text: #0B0B0B; --table-bg: #F0DC82; --table-text: #111;
+    --tooltip-bg: #F2F2F2; --tooltip-text: #111; --warn: #FFB066;
+    --nav-bg: #161618; --grad-player-mid: #00008B; --grad-player-num: #F5F5DC;
+    --grad-range-mid: #8B0000; --grad-range-num: #F5F5DC;
+    --switch-track-off: #555; --switch-track-on: #5BA3FF;
+  }
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  background: var(--bg); color: var(--text);
+  font-family: 'Chiron GoRound TC', -apple-system, "PingFang HK", system-ui, sans-serif;
+  min-height: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+body { padding-bottom: 84px; }   /* leave room for bottom nav */
+
+/* By default every Chinese and English label uses the SAME colour and
+ * near-equal sizes. Only specific roles (sub-symbol notation, helper
+ * captions like "(N/A on web)") may override these. */
+.zh, .en { display: block; color: var(--text); }
+
+/* Title */
+.title .zh { font-family: 'Chiron Sung HK', serif; font-size: 28px; line-height: 1.1; text-align: center; font-weight: 700; }
+.title .en { font-family: 'Chiron Sung HK', serif; font-size: 22px; text-align: center; font-weight: 700; }
+.title { margin: 18px 0 12px; }
+
+/* Section subtitles — NOT bold (default <h2> bold is overridden), zh
+ * on top of en, both at full text colour and near-equal sizes. */
+.subtitle {
+  text-align: center; margin: 6px 0 8px;
+  font-size: 17px;
+  font-weight: 400;             /* override default <h2> bold */
+}
+.subtitle .zh { font-size: 17px; font-weight: 400; }
+.subtitle .en { font-size: 16px; font-weight: 400; }
+.subtitle-desc { text-align: center; color: var(--text); font-size: 13px; margin: 0 0 12px; }
+
+/* Section 5 (Note) overrides the centred subtitle to left-aligned. */
+.subtitle.note-title { text-align: left; }
+.subtitle.note-title .zh, .subtitle.note-title .en { text-align: left; }
+
+/* card */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin: 12px 12px;
+  padding: 12px;
+  position: relative;
+  z-index: 1;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  row-gap: 12px;
+  column-gap: 12px;
+  align-items: center;
+}
+
+/* Field row label
+ *
+ * Chinese is the primary label (top); English directly below; the
+ * notation / symbol (e.g. "(n)" or "(Rmin - Rmax)") goes on the THIRD
+ * line below the English — not on the right of the English. Both
+ * Chinese and English share the same full text colour and near-equal
+ * sizes so they read as a single bilingual unit. */
+.label { display: flex; flex-direction: column; min-width: 0; }
+.label .zh { font-size: 15px; line-height: 1.25; }
+.label .en { font-size: 14px; line-height: 1.25; }
+.label .sym {
+  display: block;
+  margin-top: 2px;
+  color: var(--text);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.input-wrap {
+  display: inline-flex; align-items: stretch;
+  border: 1px solid var(--border); border-radius: 6px;
+  background: var(--input-bg);
+  overflow: hidden;
+  width: 130px;
+  height: 38px;
+}
+.input-wrap input {
+  flex: 1; min-width: 0; padding: 0 8px; border: 0; outline: none;
+  background: transparent; color: var(--input-text); font: inherit; font-size: 15px;
+}
+.input-wrap .stepper { display: flex; flex-direction: column; border-left: 1px solid var(--border); }
+.input-wrap .stepper button {
+  flex: 1; border: 0; background: transparent; color: var(--text);
+  cursor: pointer; padding: 0 6px; font-size: 10px;
+}
+.output-wrap {
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--border); border-radius: 6px;
+  background: var(--input-bg); color: var(--input-text);
+  width: 160px; height: 38px; padding: 0 8px;
+  font-size: 15px; text-align: center;
+  overflow: hidden; white-space: nowrap;
+}
+
+/* ===== Tooltip ===== */
+.tip-anchor { cursor: help; position: relative; }
+.tip-bubble {
+  position: fixed;
+  z-index: 10000;
+  min-width: 220px; max-width: 320px;
+  background: var(--tooltip-bg); color: var(--tooltip-text);
+  padding: 8px 10px; border-radius: 8px;
+  font-size: 13px; line-height: 1.4;
+  box-shadow: 0 8px 20px var(--shadow);
+  pointer-events: none;
+  display: none;
+}
+.tip-bubble .zh, .tip-bubble .en { color: var(--tooltip-text); }
+.tip-bubble.open { display: block; }
+
+/* Buttons — every action button is the same blue */
+.btn-row { display: flex; gap: 12px; margin-top: 12px; }
+.btn-primary {
+  background: var(--primary); color: var(--primary-text);
+  border: 0; border-radius: 8px; padding: 10px 14px; cursor: pointer;
+  font: inherit; font-weight: 600; flex: 1;
+}
+.btn-primary:disabled { background: var(--border); cursor: not-allowed; }
+.btn-primary span { display: block; color: var(--primary-text); }
+
+/* Onboarding */
+.onboard {
+  min-height: 100vh; padding: 24px;
+  display: flex; flex-direction: column; max-width: 560px; margin: 0 auto;
+}
+.bi { text-align: center; margin: 14px 0; }
+.agree-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  margin: 10px 0 12px; cursor: pointer;
+}
+.agree-row input { width: 22px; height: 22px; }
+.links { list-style: none; padding: 0; margin: 4px 0 18px; }
+.links li { padding: 4px 0; }
+.links a { color: var(--primary); text-decoration: underline; }
+.offline-time {
+  text-align: center; color: var(--text-soft); font-size: 12px; margin-top: 24px;
+  font-family: 'Chiron Sung HK', serif;
+}
+
+/* Notes paragraphs */
+.para { text-align: left; line-height: 1.55; margin: 4px 0; color: var(--text); }
+
+/* Footnote */
+.footnote {
+  margin: 24px 16px; text-align: center; color: var(--text); font-size: 13px;
+  font-family: 'Chiron Sung HK', serif;
+}
+
+/* Bottom navigation */
+.botnav {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  display: flex; justify-content: space-around;
+  background: var(--nav-bg); border-top: 1px solid var(--border);
+  padding: 6px 4px env(safe-area-inset-bottom, 6px);
+  z-index: 500;
+}
+.botnav button {
+  background: transparent; border: 0; cursor: pointer;
+  color: var(--text); padding: 4px 6px; min-width: 64px;
+  display: flex; flex-direction: column; align-items: center;
+  font-family: 'Chiron Hei HK', sans-serif; font-size: 11px;
+  transition: color .15s ease;
+}
+.botnav button .ico {
+  width: 26px; height: 26px; margin-bottom: 2px;
+  object-fit: contain; display: block;
+}
+[data-theme="dark"] .botnav button .ico {
+  /* Dark-on-transparent icons need inverting against the dark navbar. */
+  filter: invert(1) hue-rotate(180deg);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .botnav button .ico {
+    filter: invert(1) hue-rotate(180deg);
+  }
+}
+.botnav button .zh { font-size: 12px; color: inherit; }
+.botnav button .en { font-size: 11px; color: inherit; }
+/* Selected tab — recolour BOTH the text label AND the icon (via CSS
+ * filter on the <img>). The icons are mostly black silhouettes, so we
+ * tint to the primary colour with a hue+saturate filter chain. */
+.botnav button.active { color: var(--primary); }
+.botnav button.active .ico {
+  /* Tint the silhouette icon to the primary blue:
+   *   brightness(0) collapses the icon to pure black, then
+   *   the rest builds up the target RGB.
+   * Works on any monochrome icon regardless of original colour. */
+  filter: brightness(0) saturate(100%) invert(28%) sepia(99%) saturate(2476%) hue-rotate(199deg) brightness(94%) contrast(101%);
+}
+[data-theme="dark"] .botnav button.active .ico,
+:root:not([data-theme]) .botnav button.active .ico {
+  /* Dark-mode primary is lighter blue (#5BA3FF) — different filter chain. */
+  filter: brightness(0) saturate(100%) invert(57%) sepia(96%) saturate(414%) hue-rotate(186deg) brightness(105%) contrast(101%);
+}
+
+/* Modal */
+.modal-scrim {
+  position: fixed; inset: 0; background: rgba(0,0,0,.55);
+  display: flex; align-items: center; justify-content: center; z-index: 800;
+  padding: 12px;
+}
+.modal {
+  background: var(--card); color: var(--text);
+  border: 1px solid var(--border); border-radius: 12px;
+  width: min(720px, 96vw); max-height: 92vh; display: flex; flex-direction: column;
+  box-shadow: 0 12px 40px var(--shadow);
+}
+.modal header {
+  display: flex; align-items: center; justify-content: center;
+  padding: 10px 12px; border-bottom: 1px solid var(--border); position: relative;
+  min-height: 50px;
+}
+/* Titles centred on the FULL modal width (not modal-minus-close-button).
+ * The close button is positioned absolutely on top of the header. */
+.modal header .titles {
+  width: 100%; text-align: center;
+  pointer-events: none;            /* close button click passes through if overlapped */
+}
+.modal header .titles .zh { font-family: 'Chiron Hei HK', sans-serif; font-size: 17px; font-weight: 400; color: var(--text); }
+.modal header .titles .en { font-family: 'Chiron Hei HK', sans-serif; font-size: 15px; font-weight: 400; color: var(--text); }
+.modal .close-x {
+  position: absolute; right: 10px; top: 10px;
+  width: 34px; height: 34px; border-radius: 17px;
+  background: var(--bg); border: 1px solid var(--border); color: var(--text);
+  font-size: 18px; cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  text-align: center;
+  -webkit-font-smoothing: antialiased;
+  z-index: 2;
+}
+.modal .body { padding: 12px; overflow: auto; flex: 1; }
+.modal iframe { width: 100%; height: min(520px, 70vh); border: 0; background: #FFFFFF; }
+[data-theme="dark"] .modal iframe {
+  background: #FFFFFF;
+  filter: invert(1) hue-rotate(180deg);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .modal iframe {
+    background: #FFFFFF;
+    filter: invert(1) hue-rotate(180deg);
+  }
+}
+
+/* Legal tabs */
+.tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 6px; }
+.tabs button {
+  flex: 1; padding: 8px 6px; background: transparent; border: 0;
+  border-bottom: 2px solid transparent; cursor: pointer; color: var(--text);
+  font-family: 'Chiron Sung HK', serif;
+}
+.tabs button .zh, .tabs button .en { display: block; color: inherit; }
+.tabs button .zh { font-size: 13px; }
+.tabs button .en { font-size: 12px; }
+.tabs button.active { border-bottom-color: var(--primary); color: var(--primary); }
+.en-only { font-size: 11px; color: var(--text); margin: 4px 0; opacity: 0.85; }
+
+/* ===== Settings ===== */
+.set-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 0; border-bottom: 1px solid var(--border); gap: 12px;
+}
+.set-row .label-bi { display: flex; flex-direction: column; min-width: 0; }
+.set-row .label-bi .zh { font-size: 14px; color: var(--text); }
+.set-row .label-bi .en { font-size: 13px; color: var(--text); }
+
+/* Real toggle switch (rectangular track + round knob) */
+.toggle-switch {
+  position: relative; width: 52px; height: 28px;
+  background: var(--switch-track-off); border-radius: 14px; cursor: pointer;
+  flex-shrink: 0;
+  transition: background .15s ease;
+}
+.toggle-switch input { position: absolute; opacity: 0; pointer-events: none; }
+.toggle-switch .knob {
+  position: absolute; top: 2px; left: 2px;
+  width: 24px; height: 24px; border-radius: 12px;
+  background: var(--switch-knob);
+  box-shadow: 0 1px 3px rgba(0,0,0,.35);
+  transition: transform .15s ease;
+}
+.toggle-switch.on { background: var(--switch-track-on); }
+.toggle-switch.on .knob { transform: translateX(24px); }
+.toggle-switch.disabled { opacity: .45; cursor: not-allowed; }
+
+/* Two stacked bi-language labels around a toggle */
+.toggle-block {
+  display: flex; align-items: center; gap: 10px;
+}
+.toggle-block .opt {
+  display: flex; flex-direction: column; text-align: center; line-height: 1.1;
+}
+.toggle-block .opt .zh { font-size: 12px; color: var(--text); }
+.toggle-block .opt .en { font-size: 11px; color: var(--text); }
+
+/* Orientation triangular slider */
+.orient-triangle {
+  position: relative;
+  width: 140px; height: 120px;
+  flex-shrink: 0;
+  touch-action: none;
+  cursor: pointer;
+}
+.orient-triangle svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.orient-triangle .glyph {
+  position: absolute;
+  font-size: 11px; font-weight: 600;
+  color: var(--text);
+  user-select: none;
+  pointer-events: auto;
+  cursor: pointer;
+}
+.orient-triangle .glyph.on { color: var(--primary); }
+.orient-triangle .knob {
+  position: absolute;
+  width: 24px; height: 24px; border-radius: 12px;
+  background: var(--switch-knob, #FFFFFF);
+  border: 2px solid var(--primary);
+  box-shadow: 0 2px 4px rgba(0,0,0,.35), inset 0 0 0 1px rgba(0,0,0,.05);
+  transition: left .2s ease, top .2s ease;
+  pointer-events: none;
+  z-index: 3;
+}
+.orient-triangle svg polygon {
+  stroke: var(--switch-track-off);
+  stroke-width: 6;
+  stroke-linejoin: round;
+}
+[data-theme="dark"] .orient-triangle svg polygon,
+.orient-triangle.dragging svg polygon {
+  stroke: var(--switch-track-on);
+}
+.orient-triangle.dragging .knob { transition: none; }
+.orient-triangle.disabled { opacity: .55; pointer-events: none; cursor: not-allowed; }
+.orient-triangle.disabled .knob { box-shadow: none; }
+.orient-triangle.disabled svg polygon { stroke: var(--border); stroke-dasharray: 6 4; }
+
+/* Captions beside the triangle (vertex labels, zh on top of en). */
+.orient-block { display: flex; align-items: center; gap: 12px; }
+.orient-block .legend { display: flex; flex-direction: column; gap: 10px; font-size: 11px; }
+.orient-block .legend .row { display: flex; flex-direction: column; line-height: 1.1; }
+.orient-block .legend .row .zh { font-size: 12px; color: var(--text); }
+.orient-block .legend .row .en { font-size: 11px; color: var(--text); }
+.orient-block .legend .row.on .zh,
+.orient-block .legend .row.on .en { color: var(--primary); }
+.orient-block .legend .row.on .zh { font-weight: 700; }
+
+/* Matrix table */
+.matrix-wrap {
+  overflow: auto;
+  position: relative;
+  max-height: 60vh;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.matrix-wrap table {
+  border-collapse: separate; border-spacing: 0; background: var(--table-bg);
+  color: var(--table-text); width: max-content;
+}
+.matrix-wrap th, .matrix-wrap td {
+  border: 1px solid var(--border); padding: 6px 8px; height: 56px;
+  min-width: 84px; text-align: center; vertical-align: middle;
+  position: relative;
+}
+.matrix-wrap th.head-col {
+  position: sticky; left: 0; z-index: 5; background: var(--table-bg);
+  width: 140px; min-width: 140px; max-width: 140px;
+  padding: 4px 6px;
+  overflow: hidden;
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.matrix-wrap th.head-col .head-inner {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 1px;
+}
+/* Both Chinese and English in the leftmost header column use the same
+ * full --table-text colour at near-equal sizes. The notation symbol
+ * (sub-script form, e.g. R_{min} – R_{max}) sits on its own line
+ * below at the same colour. */
+.matrix-wrap th.head-col .zh,
+.matrix-wrap th.head-col .en {
+  display: block; width: 100%;
+  white-space: normal; word-break: keep-all; overflow-wrap: anywhere;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--table-text);
+  font-weight: 400;
+}
+.matrix-wrap th.head-col .zh { font-size: 13px; }
+.matrix-wrap th.head-col .en { font-size: 12px; }
+.matrix-wrap th.head-col .notation {
+  display: inline-block; white-space: nowrap;
+  font-size: 12px; color: var(--table-text);
+  margin-top: 2px;
+}
+/* Subscript notation never breaks mid-token. */
+.notation { white-space: nowrap !important; }
+.notation sub { font-size: .65em; vertical-align: sub; }
+
+/* The Section-4 title (a tooltip anchor on the title text) */
+.subtitle .tip-anchor { display: inline-block; }
+
+/* ===== Highlight gradients on body cells =====
+ *
+ * Numbers are NOT bold (per user spec). Their colour comes from
+ * --grad-player-num / --grad-range-num so the same rule renders
+ * white in light mode and beige (#F5F5DC) in dark mode. A subtle
+ * dark stroke keeps the digits legible against either gradient. */
+td.hi-player {
+  background:
+    linear-gradient(135deg,
+      var(--grad-player-a) 0%,
+      var(--grad-player-mid) 50%,
+      var(--grad-player-a) 100%) !important;
+  color: var(--grad-player-num);
+  text-shadow: 0 0 1px #000, 0 0 2px #000;
+  font-weight: 400;
+}
+[data-theme="dark"] td.hi-player {
+  background:
+    linear-gradient(225deg,
+      var(--grad-player-a) 0%,
+      var(--grad-player-mid) 50%,
+      var(--grad-player-a) 100%) !important;
+}
+td.hi-range {
+  background:
+    linear-gradient(225deg,
+      var(--grad-range-a) 0%,
+      var(--grad-range-mid) 50%,
+      var(--grad-range-a) 100%) !important;
+  color: var(--grad-range-num);
+  text-shadow: 0 0 1px #000, 0 0 2px #000;
+  font-weight: 400;
+}
+[data-theme="dark"] td.hi-range {
+  background:
+    linear-gradient(135deg,
+      var(--grad-range-a) 0%,
+      var(--grad-range-mid) 50%,
+      var(--grad-range-a) 100%) !important;
+}
+td.hi-both {
+  background:
+    linear-gradient(135deg, rgba(0,0,255,.55) 0%, rgba(173,216,230,.45) 50%, rgba(0,0,255,.55) 100%),
+    linear-gradient(225deg, var(--grad-range-a) 0%, var(--grad-range-mid) 50%, var(--grad-range-a) 100%) !important;
+  color: var(--grad-player-num);
+  font-weight: 400;
+}
+[data-theme="dark"] td.hi-both {
+  background:
+    linear-gradient(225deg, rgba(0,0,255,.55) 0%, rgba(0,0,139,.5) 50%, rgba(0,0,255,.55) 100%),
+    linear-gradient(135deg, var(--grad-range-a) 0%, var(--grad-range-mid) 50%, var(--grad-range-a) 100%) !important;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .input-wrap { width: 110px; }
+  .output-wrap { width: 130px; }
+  .botnav button { min-width: 56px; }
+  .matrix-wrap th.head-col { width: 120px; min-width: 120px; max-width: 120px; }
+}

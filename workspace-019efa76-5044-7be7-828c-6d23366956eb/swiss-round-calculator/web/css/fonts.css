@@ -1,0 +1,42 @@
+/*
+ * @font-face declarations.
+ *
+ * TTF format only — chosen so the same font files can be embedded into
+ * SVG masters (app icon, splash screens) and rendered identically by
+ * any SVG processor. WOFF / WOFF2 are intentionally NOT used here even
+ * though they are smaller, because they require an extra conversion
+ * step and aren't recognised by every SVG rasteriser.
+ *
+ * font-display: block — wait for the custom font to download before
+ * painting the text at all. This matches the source GitHub Pages
+ * (e.g. https://vviinncceenntt.github.io/wongssystem.html) and avoids
+ * the inconsistent flash-of-fallback-font that `swap` sometimes causes.
+ *
+ * The TTFs themselves are NOT committed to the repo (licence-restricted
+ * + several MB each). Run the curl block in assets/fonts/README.md
+ * after cloning to populate them.
+ */
+@font-face {
+  font-family: 'Chiron Sung HK';
+  src: url('../assets/fonts/ChironSungHK.ttf') format('truetype');
+  font-display: block;
+  font-weight: normal;
+}
+@font-face {
+  font-family: 'Chiron Hei HK';
+  src: url('../assets/fonts/ChironHeiHK.ttf') format('truetype');
+  font-display: block;
+  font-weight: normal;
+}
+@font-face {
+  font-family: 'Chiron GoRound TC';
+  src: url('../assets/fonts/ChironGoRoundTC.ttf') format('truetype');
+  font-display: block;
+  font-weight: normal;
+}
+@font-face {
+  font-family: 'The Peak Font Plus';
+  src: url('../assets/fonts/ThePeakFontPlus.ttf') format('truetype');
+  font-display: block;
+  font-weight: normal;
+}
