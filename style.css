@@ -1,10 +1,10 @@
 @font-face {
-    font-family: 'The Peak Font Plus', '隨峰體Plus', 'ThePeakFontPlus', 'the-peak-font-plus', 'thepeakfontplus-regular';
-    src: url('thepeakfontplus-regular.ttf') format('truetype');
-	font-style: regular;
+    font-family: 'thepeakfontplus';
+    src: url('thepeakfontplusregular.ttf') format('truetype');
+	font-style: normal;
     font-display: block;
 }
 body {
-    font-family: 'The Peak Font Plus', '隨峰體Plus', 'ThePeakFontPlus', 'the-peak-font-plus', 'thepeakfontplus-regular';
+    font-family: 'thepeakfontplus';
 }
 
