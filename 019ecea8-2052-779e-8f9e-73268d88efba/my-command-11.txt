@@ -1,3 +1,0 @@
-I set in control panel firewall to tick node private also. I ran cmd as per your instructions to see packagerstatus running. But on iPhone, I use real IP to check status, it just calls me to download 23bytes which cannot be opened.
-
-The earlier npm install prompt was ngrok as per your guess.

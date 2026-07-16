@@ -1,9 +1,0 @@
-Upon running npx expo start --tunnel, a request to install expo@grok globally popped up and I permitted. A QR code is generated which I scanned with iPhone camera to open it in Expo Go which I signed in both on iPhone and on computer by email and under the same Wifi. The screen on iPhone says it takes much longer than it should. Then, an error message comes up:
-
-There was a problem running the requested app.
-
-Unknown error: The request timed out.
-
-exp://pxtev-c-anonymous-8081.exp.direct
-
-I force closed the Git Bash cmd and try again to use port 8082 but the same error message just except the port 8082.

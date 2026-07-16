@@ -1,9 +1,0 @@
-Legal menu icon does not fallback to privacy-document-icon.svg on mobile build. It shows nothing.
-
-The last subscript components of the subscripts look like they are aligned at the vertical center, making the first components look like floating at the top. The subscripts in mobile build do not look the same as those in web build.
-
-Align "備註：" and "Note:" of Section 5 to left, please.
-
-Make the English texts of the leftmost column of the table more visible, please.
-
-Update all the md files.

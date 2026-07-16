@@ -1,9 +1,0 @@
-After loading(longer than usually towards 98.9%-99.1% to load 1315 modules for iOS bundled in 13256ms) on Expo Go, an error appears:
-
- ERROR  Error configuring Purchases: [Error: Invalid API key. The native store is not available when running inside Expo Go, please use your Test Store API Key or create a development build in order to use native features. See [https://rev.cat/sdk-test-store](https://rev.cat/sdk-test-store) on how to use the Test Store.]
-
-The description of Tolerable Maximum Losses in Reverse Round Lookup shows "top &lt;p&gt;" instead of "top 8"(when p is 8) which the Tolerable Maximum Losses in Specific Results of similar description shows correctly in mobile build, whereas Web build is fine.
-
-The source privacy-document-icon.svg shows a shield on top of stacking documents. The left side of the shield is white and the right side is black. The web build renders it properly in light mode and inverts black and white properly in dark mode. However, mobile build renders it improperly by having the shield black on both left and right sides in both light and dark modes. Similarly, the icon for the functions menu shows a fx symbol in black properly in light mode and in white in dark mode in web build, but in mobile build the fx symbol is still black in dark mode. And I meant to keep using [https://raw.githubusercontent.com/Vviinncceenntt/icons/main/p-writing.svg](https://raw.githubusercontent.com/Vviinncceenntt/icons/main/p-writing.svg) for web build and for mobile build also if possible, only use [https://raw.githubusercontent.com/Vviinncceenntt/icons/main/privacy-document-icon.svg](https://raw.githubusercontent.com/Vviinncceenntt/icons/main/privacy-document-icon.svg) as the fallback when it cannot.
-
-The format of subscript is lost in mobile build while it still exists in web build.

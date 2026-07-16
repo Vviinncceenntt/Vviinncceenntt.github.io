@@ -1,5 +1,0 @@
-The so-called never appeared in my cmd or Terminal or Git Bash. The metro gave a warning saying no cache and then QR code was generated after 3 seconds. No such iOS Bundling 0/598 lines ever appeared in cmd or Terminal or Git Bash every time I tried before.
-
-Chrome shows a page full of Javascript text immediately as I press enter after pasting the url.
-
-Right after iPhone timed out, nothing new appeared in the Git Bash Metro Window.

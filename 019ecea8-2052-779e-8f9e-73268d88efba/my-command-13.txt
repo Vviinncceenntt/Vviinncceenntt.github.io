@@ -1,3 +1,0 @@
-The QR code is still "flat" as you say.
-
-I can find no such "Enter URL manually" on the home screen of Expo Go. There is merely nothing except a statment "Start a local development server with: npx expo start Select the local server when it appearshere."

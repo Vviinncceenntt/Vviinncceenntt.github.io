@@ -1,5 +1,0 @@
-Using exp: in Safafri did successfully open Expo Go, but then Expo Go just shows a unlogged dashboard, after a few seconds, it requires me to allow Expo Go to collect my location, I accepted but nothing happens next even though I manually log in Expo.
-
-The QR code was not too small or big. It just looks different, without 3 black square and 1 white square in the corners and there are not many squares in the middle but quite some rectangles.
-
-I have just installed Bonjour print, not yet restart.

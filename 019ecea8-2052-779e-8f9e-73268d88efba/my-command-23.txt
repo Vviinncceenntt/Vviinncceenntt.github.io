@@ -1,9 +1,0 @@
-The two 'Copy Output' buttons work(expected text strings are copied to clipboard) on Chrome but not Safari.
-
-The triangular orientation slider knob is undraggable(N/A on web). And its look has improved from a 3-point button but still does not look like the kind of slider knob of light/dark mode one.
-
-Tapping Restore Purchase receive message saying Web edition is free; no purchase to restore.
-
-The close button cross is slightly deviated from the centre point, clinging to right side within the circle. The custom font does not appear as on computer. These two issues are fine with Chrome on computer.
-
-Other elements are fine.

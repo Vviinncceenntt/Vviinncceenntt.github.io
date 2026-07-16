@@ -1,7 +1,0 @@
-On running bash [generate-assets.sh](http://generate-assets.sh) according to "Run mobile/scripts/[generate-assets.sh](http://generate-assets.sh) to produce real PNGs from the SVG masters listed in app.json._masterAssets." as stated in [TODO.md](http://TODO.md), Git Bash says: line 49: rsvg-convert: command not found
-
-Tooltip descriptions in web are found to be clipped below the containers of subsequent sections. In the sections of Specific Results and Reverse Round Lookup, they also fail to get the values such as &lt;r&gt;, &lt;p&gt;, &lt;n&gt; of the corresponding input value in the input fields.
-
-The text "Varies with Top (p=&lt;p&gt;) Placements" should not be explicitly written but be a form of tooltip of the table title "Corresponding Matrix Tableau of Rounds and Player Ranges". The texts of the descriptions of the First Column of the table just run out of their container box, spanning as a long single line across multiple cells which follow cell 1. 
-
-Check that toggle switch should be used for Theme and Orientation Lock in Settings and the words "Light" and "Dark" should be below their respective traditional Chinese.

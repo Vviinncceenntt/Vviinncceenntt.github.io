@@ -1,1 +1,0 @@
-This time the QR code using port 8083 twice is not a standard ones like the other 2 times with port 8082 and 8081. This QR code has no pillar marks in the 4 corners, making the camera not able to recognise it as a QR code.
